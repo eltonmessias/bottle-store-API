@@ -47,4 +47,26 @@ public class ProductService {
             throw new BottleStoreException("Failed to create product");
         }
     }
+
+    public ProductDTO updateProduct(ProductDTO productDTO, Long productId) {
+        Product product = productRepository.findById(productId).orElseThrow(() -> new ProductNotFoundException("Product not found"));
+        product.setName(productDTO.name());
+        product.setSellPrice(productDTO.sellPrice());
+        product.setBuyPrice(productDTO.buyPrice());
+        product.setQuantity(productDTO.quantity());
+        productRepository.save(product);
+        return convertToProductDTO(product);
+    }
+
+    public ProductDTO updateProductQuantity(Long productId, int quantity) {
+        Product product = productRepository.findById(productId).orElseThrow(() -> new ProductNotFoundException("Product not found"));
+        product.setQuantity(product.getQuantity() + quantity);
+        return convertToProductDTO(product);
+    }
+
+    public void deleteProduct(Long productId) {
+        Product product = productRepository.findById(productId).orElseThrow(() -> new ProductNotFoundException("Product not found"));
+        productRepository.delete(product);
+    }
+
 }
