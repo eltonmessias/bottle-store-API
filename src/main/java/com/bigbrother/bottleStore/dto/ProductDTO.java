@@ -1,5 +1,6 @@
 package com.bigbrother.bottleStore.dto;
 
+import com.bigbrother.bottleStore.model.Category;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
@@ -11,6 +12,7 @@ public record ProductDTO(
         double sellPrice,
         double buyPrice,
         @Min(value = 1, message = "The quantity can't be negative")
-        int quantity
+        int quantity,
+        Category category
 ) {
 }

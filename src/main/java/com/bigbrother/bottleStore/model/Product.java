@@ -1,11 +1,7 @@
 package com.bigbrother.bottleStore.model;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
+import jakarta.persistence.*;
 
 
 @Entity
@@ -17,6 +13,17 @@ public class Product {
     private double sellPrice;
     private double buyPrice;
     private int quantity;
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
 
     public long getId() {
         return id;
