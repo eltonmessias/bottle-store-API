@@ -22,7 +22,8 @@ public class ProductService {
                 product.getName(),
                 product.getSellPrice(),
                 product.getBuyPrice(),
-                product.getQuantity()
+                product.getQuantity(),
+                product.getCategory()
         );
     }
 
