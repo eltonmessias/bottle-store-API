@@ -39,5 +39,18 @@ public class CategoryService {
         return convertToCategoryDTO(category);
     }
 
+    public CategoryDTO updateCategory(CategoryDTO categoryDTO, Long id) {
+        Category category = categoryRepository.findById(id).orElseThrow(() -> new CategoryNotFoundException("Category not found"));
+        category.setName(categoryDTO.name());
+        category.setDescription(categoryDTO.description());
+        categoryRepository.save(category);
+        return convertToCategoryDTO(category);
+    }
+
+    public void deleteCategory(Long id) {
+        Category category = categoryRepository.findById(id).orElseThrow(() -> new CategoryNotFoundException("Category not found"));
+        categoryRepository.delete(category);
+    }
+
 
 }
