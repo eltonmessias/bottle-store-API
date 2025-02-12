@@ -60,6 +60,12 @@ public class ProductService {
         }
     }
 
+    public ProductDTO getProductById(long id) {
+        Product product = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product not found"));
+        return convertToProductDTO(product);
+
+    }
+
     public ProductDTO updateProduct(ProductDTO productDTO, Long productId) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new ProductNotFoundException("Product not found"));
         product.setName(productDTO.name());
