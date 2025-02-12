@@ -1,9 +1,13 @@
 package com.bigbrother.bottleStore.controller;
 
+import com.bigbrother.bottleStore.dto.JwtResponse;
+import com.bigbrother.bottleStore.dto.LoginResponse;
+import com.bigbrother.bottleStore.dto.TokenRefreshRequestDTO;
 import com.bigbrother.bottleStore.dto.UserDTO;
 import com.bigbrother.bottleStore.enums.ROLE;
 import com.bigbrother.bottleStore.model.User;
 import com.bigbrother.bottleStore.repository.UserRepository;
+import com.bigbrother.bottleStore.service.AuthService;
 import com.bigbrother.bottleStore.service.JwtService;
 import com.bigbrother.bottleStore.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +16,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
+@CrossOrigin
+@RequestMapping("/bigbrother/api/auth")
 public class AuthController {
 
 
@@ -30,6 +32,9 @@ public class AuthController {
     private JwtService jwtService;
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private AuthService authService;
 
 
     @PostMapping("/register")
@@ -47,14 +52,21 @@ public class AuthController {
                 User user = userRepository.findByUsername(credentials.username());
                 ROLE role = user.getRole();
 
-                String token = jwtService.generateToken(credentials.username(), role);
-                return ResponseEntity.ok(new AuthResponse(token, "Login Successfuly"));
+                String accessToken = jwtService.generateToken(credentials.username(), role);
+                String refreshToken = jwtService.generateRefreshToken(credentials.username());
+                return ResponseEntity.ok(new LoginResponse(accessToken, refreshToken, "Login Successfuly"));
             }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(null, "Invalid username or password"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(e.getMessage(), "Invalid username or password"));
         }
     }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<JwtResponse> refreshToken(@RequestBody TokenRefreshRequestDTO request) {
+        return ResponseEntity.ok(authService.refreshAccessToken(request.refreshToken()));
+    }
+    
 
 
 
