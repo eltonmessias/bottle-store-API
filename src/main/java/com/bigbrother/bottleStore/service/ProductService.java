@@ -51,6 +51,7 @@ public class ProductService {
             product.setSellingPrice(productDTO.sellingPrice());
             product.setPurchasePrice(productDTO.purchasePrice());
             product.setStockQuantity(productDTO.stockQuantity());
+            product.setUnitType(productDTO.unitType());
             product.setCategory(category);
             productRepository.save(product);
             return convertToProductDTO(product);

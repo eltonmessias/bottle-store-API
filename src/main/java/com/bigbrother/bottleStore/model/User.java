@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 @Entity
+@Data
 @Table(name = "users")
 public class User {
 
@@ -40,59 +41,6 @@ public class User {
     private ROLE role;
 
 
-    public long getId() {
-        return id;
-    }
 
-    public void setId(long id) {
-        this.id = id;
-    }
 
-    public @NotNull String getUsername() {
-        return username;
-    }
-
-    public void setUsername(@NotNull String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public @Email String getEmail() {
-        return email;
-    }
-
-    public void setEmail(@Email String email) {
-        this.email = email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public ROLE getRole() {
-        return role;
-    }
-
-    public void setRole(ROLE role) {
-        this.role = role;
-    }
 }

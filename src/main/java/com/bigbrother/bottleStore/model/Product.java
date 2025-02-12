@@ -18,6 +18,7 @@ public class Product {
     private double sellingPrice;
     private double purchasePrice;
     private int stockQuantity;
+    @Enumerated(EnumType.STRING)
     private ProductUnitType unitType;
     @ManyToOne
     @JoinColumn(name = "category_id")
