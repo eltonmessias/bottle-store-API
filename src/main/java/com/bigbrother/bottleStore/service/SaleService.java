@@ -19,6 +19,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -121,5 +122,15 @@ public class SaleService {
         Sale sale = saleRepository.findById(saleId).orElseThrow(() -> new SaleNotFoundException("Sale not found"));
         List<SaleItem> saleItemList = saleItemRepository.findBySaleId(sale.getId());
         return convertToSaleItemDTO(saleItemList);
+    }
+
+    public List<SaleDTO> getSalesByDate(LocalDate saleDate) {
+        LocalDateTime startOfDay = saleDate.atStartOfDay();
+        LocalDateTime endOfDay = saleDate.plusDays(1).atStartOfDay();
+        List<Sale> sales = saleRepository.findSaleBySaleDateBetween(startOfDay, endOfDay);
+        if (sales.isEmpty()) {
+            throw new SaleNotFoundException("Sale not found");
+        }
+        return sales.stream().map(this::convertToSaleDTO).collect(Collectors.toList());
     }
 }

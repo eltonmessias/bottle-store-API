@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -39,5 +40,10 @@ public class SaleController {
         return new ResponseEntity<>(saleService.getSalesBySellerId(id), HttpStatus.OK);
     }
 
+    @GetMapping("/date/{saleDate}")
+    public ResponseEntity<List<SaleDTO>> getSalesBySaleDate(@PathVariable String saleDate) {
+        LocalDate date = LocalDate.parse(saleDate);
+        return new ResponseEntity<>(saleService.getSalesByDate(date), HttpStatus.OK);
+    }
 
 }
