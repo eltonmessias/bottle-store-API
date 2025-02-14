@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/bigbrother/api/sales")
 public class SaleController {
@@ -25,5 +27,10 @@ public class SaleController {
     @GetMapping("/{id}")
     public ResponseEntity<SaleDTO> getSale(@PathVariable long id) {
         return new ResponseEntity<>(saleService.getSaleById(id), HttpStatus.OK);
+    }
+
+    @GetMapping("")
+    public ResponseEntity<List<SaleDTO>> getAllSales() {
+        return new ResponseEntity<>(saleService.getAllSales(), HttpStatus.OK);
     }
 }

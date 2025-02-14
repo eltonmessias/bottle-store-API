@@ -101,4 +101,9 @@ public class SaleService {
         Sale sale = saleRepository.findById(id).orElseThrow(() -> new SaleNotFoundException("Sale not found"));
         return convertToSaleDTO(sale);
     }
+
+    public List<SaleDTO> getAllSales() {
+        List<Sale> saleList = saleRepository.findAll();
+        return saleList.stream().map(this::convertToSaleDTO).collect(Collectors.toList());
+    }
 }
