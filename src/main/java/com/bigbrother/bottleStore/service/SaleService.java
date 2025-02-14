@@ -12,6 +12,7 @@ import com.bigbrother.bottleStore.model.Sale;
 import com.bigbrother.bottleStore.model.SaleItem;
 import com.bigbrother.bottleStore.model.User;
 import com.bigbrother.bottleStore.repository.ProductRepository;
+import com.bigbrother.bottleStore.repository.SaleItemRepository;
 import com.bigbrother.bottleStore.repository.SaleRepository;
 import com.bigbrother.bottleStore.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -27,6 +28,8 @@ public class SaleService {
 
     @Autowired
     private SaleRepository saleRepository;
+    @Autowired
+    private SaleItemRepository saleItemRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -104,6 +107,13 @@ public class SaleService {
 
     public List<SaleDTO> getAllSales() {
         List<Sale> saleList = saleRepository.findAll();
+        return saleList.stream().map(this::convertToSaleDTO).collect(Collectors.toList());
+    }
+
+
+    public List<SaleDTO> getSalesBySellerId(Long sellerId) {
+        User user = userRepository.findById(sellerId).orElseThrow(() -> new UserNotFoundException("User not found"));
+        List<Sale> saleList = saleRepository.findBySellerId(user.getId());
         return saleList.stream().map(this::convertToSaleDTO).collect(Collectors.toList());
     }
 }

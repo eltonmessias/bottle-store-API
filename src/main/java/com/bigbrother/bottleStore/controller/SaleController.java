@@ -33,4 +33,9 @@ public class SaleController {
     public ResponseEntity<List<SaleDTO>> getAllSales() {
         return new ResponseEntity<>(saleService.getAllSales(), HttpStatus.OK);
     }
+
+    @GetMapping("/seller/{id}")
+    public ResponseEntity<List<SaleDTO>> getSalesBySellerId(@PathVariable long id) {
+        return new ResponseEntity<>(saleService.getSalesBySellerId(id), HttpStatus.OK);
+    }
 }
