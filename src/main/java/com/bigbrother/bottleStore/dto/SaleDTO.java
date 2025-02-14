@@ -1,7 +1,5 @@
 package com.bigbrother.bottleStore.dto;
 
-import com.bigbrother.bottleStore.model.SaleItem;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -11,7 +9,7 @@ public record SaleDTO(
         LocalDateTime saleDate,
         Double totalAmount,
         Double totalProfit,
-        List<SaleItem> items
+        List<SaleItemDTO> items
 
 ) {
 }

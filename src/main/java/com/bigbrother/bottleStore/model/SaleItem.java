@@ -21,4 +21,20 @@ public class SaleItem {
     private Double totalPrice;
     private Double profit;
 
+
+    @PrePersist
+    @PreUpdate
+    public void calculateTotalPrice() {
+        this.profit = calculateProfit();
+        totalPrice = unitPrice + profit;
+
+    }
+
+
+
+    public double calculateProfit() {
+        double costPrice = product.getPurchasePrice();
+        return quantity * (unitPrice - costPrice);
+    }
+
 }
