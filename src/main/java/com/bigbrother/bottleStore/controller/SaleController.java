@@ -38,4 +38,6 @@ public class SaleController {
     public ResponseEntity<List<SaleDTO>> getSalesBySellerId(@PathVariable long id) {
         return new ResponseEntity<>(saleService.getSalesBySellerId(id), HttpStatus.OK);
     }
+
+
 }
