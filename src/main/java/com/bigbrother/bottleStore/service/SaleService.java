@@ -125,11 +125,19 @@ public class SaleService {
     }
 
     public List<SaleDTO> getSalesByDate(LocalDate saleDate) {
-        LocalDateTime startOfDay = saleDate.atStartOfDay();
-        LocalDateTime endOfDay = saleDate.plusDays(1).atStartOfDay();
+        return getSaleDTOS(saleDate, saleDate);
+    }
+
+    public List<SaleDTO> getSalesByDateBetween(LocalDate startDate, LocalDate endDate) {
+        return getSaleDTOS(startDate, endDate);
+    }
+
+    private List<SaleDTO> getSaleDTOS(LocalDate startDate, LocalDate endDate) {
+        LocalDateTime startOfDay = startDate.atStartOfDay();
+        LocalDateTime endOfDay = endDate.plusDays(1).atStartOfDay();
         List<Sale> sales = saleRepository.findSaleBySaleDateBetween(startOfDay, endOfDay);
         if (sales.isEmpty()) {
-            throw new SaleNotFoundException("Sale not found");
+            throw new SaleNotFoundException("Sales not found");
         }
         return sales.stream().map(this::convertToSaleDTO).collect(Collectors.toList());
     }

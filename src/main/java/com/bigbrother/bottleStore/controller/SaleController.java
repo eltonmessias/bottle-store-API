@@ -1,6 +1,8 @@
 package com.bigbrother.bottleStore.controller;
 
 import com.bigbrother.bottleStore.dto.SaleDTO;
+import com.bigbrother.bottleStore.model.Sale;
+import com.bigbrother.bottleStore.repository.SaleRepository;
 import com.bigbrother.bottleStore.service.SaleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,8 @@ public class SaleController {
 
     @Autowired
     private SaleService saleService;
+    @Autowired
+    private SaleRepository saleRepository;
 
 
     @PostMapping("")
@@ -46,4 +50,13 @@ public class SaleController {
         return new ResponseEntity<>(saleService.getSalesByDate(date), HttpStatus.OK);
     }
 
+
+    @GetMapping("/date/between")
+    public ResponseEntity<List<SaleDTO>> getSalesByDateBetween(@RequestParam String startDate, @RequestParam String endDate){
+        LocalDate start = LocalDate.parse(startDate);
+        LocalDate end = LocalDate.parse(endDate);
+
+        List<SaleDTO> sales = saleService.getSalesByDateBetween(start, end);
+        return new ResponseEntity<>(sales, HttpStatus.OK);
+    }
 }
