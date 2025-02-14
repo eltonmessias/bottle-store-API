@@ -1,9 +1,11 @@
 package com.bigbrother.bottleStore.service;
 
 
+import com.bigbrother.bottleStore.dto.ProductDTO;
 import com.bigbrother.bottleStore.dto.SaleDTO;
 import com.bigbrother.bottleStore.dto.SaleItemDTO;
 import com.bigbrother.bottleStore.exceptions.ProductNotFoundException;
+import com.bigbrother.bottleStore.exceptions.SaleNotFoundException;
 import com.bigbrother.bottleStore.exceptions.UserNotFoundException;
 import com.bigbrother.bottleStore.model.Product;
 import com.bigbrother.bottleStore.model.Sale;
@@ -93,5 +95,10 @@ public class SaleService {
 
         sale.updateTotals();
         return convertToSaleDTO(saleRepository.save(sale));
+    }
+
+    public SaleDTO getSaleById(Long id) {
+        Sale sale = saleRepository.findById(id).orElseThrow(() -> new SaleNotFoundException("Sale not found"));
+        return convertToSaleDTO(sale);
     }
 }
