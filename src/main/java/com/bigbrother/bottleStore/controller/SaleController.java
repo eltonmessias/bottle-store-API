@@ -39,6 +39,11 @@ public class SaleController {
         return new ResponseEntity<>(saleService.getAllSales(), HttpStatus.OK);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<SaleDTO> updateSale(@RequestBody SaleDTO saleDTO, @PathVariable long id) {
+        return new ResponseEntity<>(saleService.updateSale(saleDTO, id), HttpStatus.CREATED);
+    }
+
     @GetMapping("/seller/{id}")
     public ResponseEntity<List<SaleDTO>> getSalesBySellerId(@PathVariable long id) {
         return new ResponseEntity<>(saleService.getSalesBySellerId(id), HttpStatus.OK);
