@@ -4,6 +4,7 @@ package com.bigbrother.bottleStore.service;
 import com.bigbrother.bottleStore.dto.ProductDTO;
 import com.bigbrother.bottleStore.dto.SaleDTO;
 import com.bigbrother.bottleStore.dto.SaleItemDTO;
+import com.bigbrother.bottleStore.exceptions.InsufficientStockException;
 import com.bigbrother.bottleStore.exceptions.ProductNotFoundException;
 import com.bigbrother.bottleStore.exceptions.SaleNotFoundException;
 import com.bigbrother.bottleStore.exceptions.UserNotFoundException;
@@ -75,6 +76,8 @@ public class SaleService {
 
 
 
+
+
     @Transactional
     public SaleDTO createSale(Long sellerId, LocalDateTime saleDate, List<SaleItemDTO> items) {
         Sale sale = new Sale();
@@ -140,5 +143,50 @@ public class SaleService {
             throw new SaleNotFoundException("Sales not found");
         }
         return sales.stream().map(this::convertToSaleDTO).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public SaleDTO updateSale(SaleDTO saleDTO, Long id) {
+        Sale sale = saleRepository.findById(id).orElseThrow(() -> new SaleNotFoundException("Sale does not exists"));
+
+        for (SaleItem oldItem: sale.getProducts()){
+            Product product = oldItem.getProduct();
+            product.setStockQuantity(product.getStockQuantity() + oldItem.getQuantity());
+            productRepository.save(product);
+        }
+
+        sale.getProducts().clear();
+
+        if(saleDTO.saleDate() != null) {
+            sale.setSaleDate(saleDTO.saleDate());
+        }
+
+
+
+
+
+        for (SaleItemDTO itemDTO : saleDTO.items()){
+            Product product = productRepository.findById(itemDTO.productId()).orElseThrow(() -> new ProductNotFoundException("Product not found"));
+
+            if(product.getStockQuantity() < itemDTO.quantity()){
+                throw new InsufficientStockException("Not enough stock for product ID:" + itemDTO.productId());
+            }
+
+            product.setStockQuantity(product.getStockQuantity() - itemDTO.quantity());
+            productRepository.save(product);
+
+            SaleItem saleItem = new SaleItem();
+            saleItem.setSale(sale);
+            saleItem.setProduct(product);
+            saleItem.setQuantity(itemDTO.quantity());
+            saleItem.setUnitPrice(product.getSellingPrice());
+            saleItem.calculateTotalPrice();
+
+            sale.getProducts().add(saleItem);
+        }
+
+        sale.updateTotals();
+
+        return convertToSaleDTO(saleRepository.save(sale));
     }
 }
