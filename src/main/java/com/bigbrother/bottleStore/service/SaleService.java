@@ -74,6 +74,37 @@ public class SaleService {
     }
 
 
+    private Sale saveSale(Sale sale, List<SaleItemDTO> items) {
+        for (SaleItemDTO itemDTO : items) {
+            Product product = productRepository.findById(itemDTO.productId())
+                    .orElseThrow(() -> new ProductNotFoundException("Product not found"));
+
+            // Verifica se há estoque suficiente
+            if (product.getStockQuantity() < itemDTO.quantity()) {
+                throw new InsufficientStockException("Not enough stock for product ID: " + itemDTO.productId());
+            }
+
+            // Atualiza o estoque do produto
+            product.setStockQuantity(product.getStockQuantity() - itemDTO.quantity());
+            productRepository.save(product);
+
+            // Cria um novo SaleItem
+            SaleItem saleItem = new SaleItem();
+            saleItem.setSale(sale);
+            saleItem.setProduct(product);
+            saleItem.setQuantity(itemDTO.quantity());
+            saleItem.setUnitPrice(product.getSellingPrice());
+            saleItem.calculateTotalPrice();
+            saleItem.calculateProfit();
+
+            sale.getProducts().add(saleItem);
+        }
+
+        // Atualiza os totais
+        sale.updateTotals();
+
+        return saleRepository.save(sale);
+    }
 
 
 
@@ -85,24 +116,31 @@ public class SaleService {
         sale.setSeller(seller);
         sale.setSaleDate(saleDate != null ? saleDate : LocalDateTime.now());
 
+        return convertToSaleDTO(saveSale(sale, items));
+    }
 
 
-        for (SaleItemDTO itemDTO : items) {
-            Product product = productRepository.findById(itemDTO.productId()).orElseThrow(() -> new ProductNotFoundException("Product not found"));
 
-            SaleItem saleItem = new SaleItem();
-            saleItem.setSale(sale);
-            saleItem.setProduct(product);
-            saleItem.setQuantity(itemDTO.quantity());
-            saleItem.setUnitPrice(product.getSellingPrice());
-            saleItem.calculateTotalPrice();
-            saleItem.calculateProfit();
-            sale.getProducts().add(saleItem);
+
+    @Transactional
+    public SaleDTO updateSale(SaleDTO saleDTO, Long id) {
+        Sale sale = saleRepository.findById(id).orElseThrow(() -> new SaleNotFoundException("Sale does not exists"));
+
+        for (SaleItem oldItem: sale.getProducts()){
+            Product product = oldItem.getProduct();
+            product.setStockQuantity(product.getStockQuantity() + oldItem.getQuantity());
+            productRepository.save(product);
         }
 
-        sale.updateTotals();
-        return convertToSaleDTO(saleRepository.save(sale));
+        sale.getProducts().clear();
+
+        if(saleDTO.saleDate() != null) {
+            sale.setSaleDate(saleDTO.saleDate());
+        }
+
+        return convertToSaleDTO(saveSale(sale, saleDTO.items()));
     }
+
 
     public SaleDTO getSaleById(Long id) {
         Sale sale = saleRepository.findById(id).orElseThrow(() -> new SaleNotFoundException("Sale not found"));
@@ -145,48 +183,4 @@ public class SaleService {
         return sales.stream().map(this::convertToSaleDTO).collect(Collectors.toList());
     }
 
-    @Transactional
-    public SaleDTO updateSale(SaleDTO saleDTO, Long id) {
-        Sale sale = saleRepository.findById(id).orElseThrow(() -> new SaleNotFoundException("Sale does not exists"));
-
-        for (SaleItem oldItem: sale.getProducts()){
-            Product product = oldItem.getProduct();
-            product.setStockQuantity(product.getStockQuantity() + oldItem.getQuantity());
-            productRepository.save(product);
-        }
-
-        sale.getProducts().clear();
-
-        if(saleDTO.saleDate() != null) {
-            sale.setSaleDate(saleDTO.saleDate());
-        }
-
-
-
-
-
-        for (SaleItemDTO itemDTO : saleDTO.items()){
-            Product product = productRepository.findById(itemDTO.productId()).orElseThrow(() -> new ProductNotFoundException("Product not found"));
-
-            if(product.getStockQuantity() < itemDTO.quantity()){
-                throw new InsufficientStockException("Not enough stock for product ID:" + itemDTO.productId());
-            }
-
-            product.setStockQuantity(product.getStockQuantity() - itemDTO.quantity());
-            productRepository.save(product);
-
-            SaleItem saleItem = new SaleItem();
-            saleItem.setSale(sale);
-            saleItem.setProduct(product);
-            saleItem.setQuantity(itemDTO.quantity());
-            saleItem.setUnitPrice(product.getSellingPrice());
-            saleItem.calculateTotalPrice();
-
-            sale.getProducts().add(saleItem);
-        }
-
-        sale.updateTotals();
-
-        return convertToSaleDTO(saleRepository.save(sale));
-    }
 }

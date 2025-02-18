@@ -25,9 +25,8 @@ public class SaleItem {
     @PrePersist
     @PreUpdate
     public void calculateTotalPrice() {
-        this.profit = calculateProfit();
-        totalPrice = unitPrice + profit;
-
+        this.profit = calculateProfit();  // Calcula o lucro antes de usá-lo
+        this.totalPrice = this.unitPrice * this.quantity;
     }
 
 
