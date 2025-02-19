@@ -64,4 +64,10 @@ public class SaleController {
         List<SaleDTO> sales = saleService.getSalesByDateBetween(start, end);
         return new ResponseEntity<>(sales, HttpStatus.OK);
     }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> deleteSale(@PathVariable Long id) {
+        saleService.deleteSale(id);
+        return ResponseEntity.noContent().build();
+    }
 }

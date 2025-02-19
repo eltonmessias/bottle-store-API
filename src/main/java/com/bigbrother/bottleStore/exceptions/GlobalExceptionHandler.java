@@ -38,4 +38,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleInsufficientStockException(InsufficientStockException e) {
         return ResponseEntity.status(HttpStatus.INSUFFICIENT_STORAGE).body(e.getMessage());
     }
+
+    @ExceptionHandler(DatabaseException.class)
+    public ResponseEntity<String> handleDatabaseException(DatabaseException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+
+    @ExceptionHandler(StockUpdateException.class)
+    public  ResponseEntity<String> handleStockUpdateException(StockUpdateException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+
 }

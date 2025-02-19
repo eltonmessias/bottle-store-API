@@ -4,10 +4,7 @@ package com.bigbrother.bottleStore.service;
 import com.bigbrother.bottleStore.dto.ProductDTO;
 import com.bigbrother.bottleStore.dto.SaleDTO;
 import com.bigbrother.bottleStore.dto.SaleItemDTO;
-import com.bigbrother.bottleStore.exceptions.InsufficientStockException;
-import com.bigbrother.bottleStore.exceptions.ProductNotFoundException;
-import com.bigbrother.bottleStore.exceptions.SaleNotFoundException;
-import com.bigbrother.bottleStore.exceptions.UserNotFoundException;
+import com.bigbrother.bottleStore.exceptions.*;
 import com.bigbrother.bottleStore.model.Product;
 import com.bigbrother.bottleStore.model.Sale;
 import com.bigbrother.bottleStore.model.SaleItem;
@@ -18,6 +15,7 @@ import com.bigbrother.bottleStore.repository.SaleRepository;
 import com.bigbrother.bottleStore.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -182,5 +180,28 @@ public class SaleService {
         }
         return sales.stream().map(this::convertToSaleDTO).collect(Collectors.toList());
     }
+
+
+    public void deleteSale(Long saleId) {
+        Sale sale = saleRepository.findById(saleId).orElseThrow(() -> new SaleNotFoundException("Sale not found with ID: "+ saleId));
+
+        try {
+            for (SaleItem saleItem: sale.getProducts()){
+                Product product = saleItem.getProduct();
+                if(product == null) {
+                    throw new StockUpdateException("Product not found for sale item ID: " + saleItem.getId());
+                }
+                product.setStockQuantity(product.getStockQuantity() + saleItem.getQuantity());
+                productRepository.save(product);
+            }
+            saleRepository.delete(sale);
+        } catch (DataIntegrityViolationException e) {
+            throw new DatabaseException("Cannot delete sale ID: "+ saleId + " due to database constraints");
+        } catch (Exception e) {
+            throw new DatabaseException("Unexpected error while deleting sale ID: " + saleId);
+        }
+
+    }
+
 
 }
