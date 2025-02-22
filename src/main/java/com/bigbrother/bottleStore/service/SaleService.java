@@ -4,15 +4,10 @@ package com.bigbrother.bottleStore.service;
 import com.bigbrother.bottleStore.dto.ProductDTO;
 import com.bigbrother.bottleStore.dto.SaleDTO;
 import com.bigbrother.bottleStore.dto.SaleItemDTO;
+import com.bigbrother.bottleStore.dto.SalePaymentDTO;
 import com.bigbrother.bottleStore.exceptions.*;
-import com.bigbrother.bottleStore.model.Product;
-import com.bigbrother.bottleStore.model.Sale;
-import com.bigbrother.bottleStore.model.SaleItem;
-import com.bigbrother.bottleStore.model.User;
-import com.bigbrother.bottleStore.repository.ProductRepository;
-import com.bigbrother.bottleStore.repository.SaleItemRepository;
-import com.bigbrother.bottleStore.repository.SaleRepository;
-import com.bigbrother.bottleStore.repository.UserRepository;
+import com.bigbrother.bottleStore.model.*;
+import com.bigbrother.bottleStore.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -20,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,6 +31,10 @@ public class SaleService {
     private UserRepository userRepository;
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private AuthService authService;
+    @Autowired
+    private SalePaymentRepository salePaymentRepository;
 
     private SaleDTO convertToSaleDTO(Sale sale) {
 
@@ -48,13 +48,21 @@ public class SaleService {
                 item.getProfit()
         )).toList();
 
+        List<SalePaymentDTO> salePaymentDTO = sale.getPayments().stream().map(salePayment -> new SalePaymentDTO(
+                salePayment.getId(),
+                salePayment.getSale().getId(),
+                salePayment.getPaymentMethod(),
+                salePayment.getAmount()
+        )).toList();
+
         return new SaleDTO(
                 sale.getId(),
                 sale.getSeller().getId(),
                 sale.getSaleDate(),
                 sale.getTotalAmount(),
                 sale.getTotalProfit(),
-                saleItemDTO
+                saleItemDTO,
+                salePaymentDTO
         );
     }
     public List<SaleItemDTO> convertToSaleItemDTO(List<SaleItem> saleItems) {
@@ -108,13 +116,26 @@ public class SaleService {
 
 
     @Transactional
-    public SaleDTO createSale(Long sellerId, LocalDateTime saleDate, List<SaleItemDTO> items) {
+    public SaleDTO createSale(LocalDateTime saleDate, List<SaleItemDTO> items, List<SalePaymentDTO> payments) {
         Sale sale = new Sale();
-        User seller = userRepository.findById(sellerId).orElseThrow(() -> new UserNotFoundException("Seller not found"));
+        User seller = userRepository.findByUsername(authService.getLoggedInUsername());
         sale.setSeller(seller);
         sale.setSaleDate(saleDate != null ? saleDate : LocalDateTime.now());
 
-        return convertToSaleDTO(saveSale(sale, items));
+        Sale savedSale = saveSale(sale, items);
+
+        List<SalePayment> paymentList = payments.stream().map(paymentDTO -> {
+            SalePayment payment = new SalePayment();
+            payment.setSale(savedSale);
+            payment.setPaymentMethod(paymentDTO.type());
+            payment.setAmount(paymentDTO.amount());
+            return payment;
+        }).toList();
+
+        salePaymentRepository.saveAll(paymentList);
+        savedSale.setPayments(paymentList);
+
+        return convertToSaleDTO(savedSale);
     }
 
 

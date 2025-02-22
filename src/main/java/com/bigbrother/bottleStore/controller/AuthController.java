@@ -18,6 +18,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @CrossOrigin
 @RequestMapping("/bigbrother/api/auth")
@@ -65,6 +67,11 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<JwtResponse> refreshToken(@RequestBody TokenRefreshRequestDTO request) {
         return ResponseEntity.ok(authService.refreshAccessToken(request.refreshToken()));
+    }
+
+    @GetMapping("/username")
+    private Map<String, String> getLoggedInUsername() {
+        return Map.of("username", authService.getLoggedInUsername());
     }
     
 

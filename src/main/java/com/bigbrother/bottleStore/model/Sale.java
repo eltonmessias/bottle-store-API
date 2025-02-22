@@ -19,6 +19,9 @@ public class Sale {
     @ManyToOne
     private User seller;
 
+    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SalePayment> payments = new ArrayList<>();
+
     private LocalDateTime saleDate;
     private Double totalAmount;
     private Double totalProfit;

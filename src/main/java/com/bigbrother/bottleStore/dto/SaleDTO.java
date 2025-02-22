@@ -9,7 +9,8 @@ public record SaleDTO(
         LocalDateTime saleDate,
         Double totalAmount,
         Double totalProfit,
-        List<SaleItemDTO> items
+        List<SaleItemDTO> items,
+        List<SalePaymentDTO> payments
 
 ) {
 }

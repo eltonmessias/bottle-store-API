@@ -26,7 +26,7 @@ public class SaleController {
     @PostMapping("")
     public ResponseEntity<SaleDTO> createSale(@RequestBody SaleDTO saleDTO) {
 
-        return new ResponseEntity<>(saleService.createSale(saleDTO.sellerId(), saleDTO.saleDate(), saleDTO.items()), HttpStatus.CREATED);
+        return new ResponseEntity<>(saleService.createSale(saleDTO.saleDate(), saleDTO.items(), saleDTO.payments()), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
