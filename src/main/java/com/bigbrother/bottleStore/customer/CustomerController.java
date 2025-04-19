@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/customer")
@@ -24,5 +25,10 @@ public class CustomerController {
     @GetMapping
     public ResponseEntity<List<CustomerResponse>> findAllCustomers() {
         return new ResponseEntity<>(service.findAllCustomers(), HttpStatus.OK);
+    }
+
+    @GetMapping("/{customer-id}")
+    public ResponseEntity<CustomerResponse> findCustomerById(@PathVariable("customer-id") UUID customerId) {
+        return ResponseEntity.ok(service.findCustomerById(customerId));
     }
 }

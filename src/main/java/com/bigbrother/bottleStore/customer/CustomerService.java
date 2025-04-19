@@ -1,11 +1,13 @@
 package com.bigbrother.bottleStore.customer;
 
 
+import com.bigbrother.bottleStore.exceptions.CustomerNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,5 +24,11 @@ public class CustomerService {
 
     public List<CustomerResponse> findAllCustomers() {
         return repository.findAll().stream().map(mapper::fromCustomer).collect(Collectors.toList());
+    }
+
+
+    public CustomerResponse findCustomerById(UUID customerId) {
+        var customer = repository.findById(customerId).orElseThrow(()-> new CustomerNotFoundException("Customer not found"));
+        return mapper.fromCustomer(customer);
     }
 }
