@@ -1,0 +1,25 @@
+services:
+  postgres:
+    container_name: bottleStore_db
+    image: postgres
+    environment:
+      POSTGRES_USER: eltonmessias
+      POSTGRES_PASSWORD: messias8669
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    networks:
+      - bottleStore-net
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+
+
+networks:
+  bottleStore-net:
+    driver: bridge
+
+
+volumes:
+  postgres:

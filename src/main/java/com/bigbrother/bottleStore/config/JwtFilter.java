@@ -1,8 +1,7 @@
 package com.bigbrother.bottleStore.config;
 
-import com.bigbrother.bottleStore.enums.ROLE;
-import com.bigbrother.bottleStore.service.JwtService;
-import com.bigbrother.bottleStore.service.MyUserDetailsService;
+import com.bigbrother.bottleStore.user.ROLE;
+import com.bigbrother.bottleStore.jwt.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
