@@ -31,4 +31,9 @@ public class CustomerController {
     public ResponseEntity<CustomerResponse> findCustomerById(@PathVariable("customer-id") UUID customerId) {
         return ResponseEntity.ok(service.findCustomerById(customerId));
     }
+
+    @PutMapping("/{customer-id}")
+    public ResponseEntity<CustomerResponse> updateCustomer(@PathVariable("customer-id") UUID customerId, @RequestBody @Valid CustomerRequest request) {
+        return ResponseEntity.ok(service.updateCustomer(customerId, request));
+    }
 }

@@ -31,4 +31,13 @@ public class CustomerService {
         var customer = repository.findById(customerId).orElseThrow(()-> new CustomerNotFoundException("Customer not found"));
         return mapper.fromCustomer(customer);
     }
+
+    public CustomerResponse updateCustomer(UUID customerId, @Valid CustomerRequest request) {
+        var customer = repository.findById(customerId).orElseThrow(()-> new CustomerNotFoundException("Customer not found"));
+        customer.setFirstName(request.firstName());
+        customer.setLastName(request.lastName());
+        customer.setEmail(request.email());
+        customer.setPhone(request.phone());
+        return mapper.fromCustomer(customer);
+    }
 }
