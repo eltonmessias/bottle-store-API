@@ -36,4 +36,11 @@ public class CustomerController {
     public ResponseEntity<CustomerResponse> updateCustomer(@PathVariable("customer-id") UUID customerId, @RequestBody @Valid CustomerRequest request) {
         return ResponseEntity.ok(service.updateCustomer(customerId, request));
     }
+
+    @DeleteMapping("/{customer-id}")
+    public ResponseEntity<?> deleteCustomer(@PathVariable("customer-id") UUID customerId) {
+        service.deleteCustomer(customerId);
+        return ResponseEntity.noContent().build();
+    }
 }
+

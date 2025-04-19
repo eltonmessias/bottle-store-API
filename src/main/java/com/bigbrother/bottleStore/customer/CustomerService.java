@@ -40,4 +40,9 @@ public class CustomerService {
         customer.setPhone(request.phone());
         return mapper.fromCustomer(customer);
     }
+
+    public void deleteCustomer(UUID customerId) {
+        var customer = repository.findById(customerId).orElseThrow(()-> new CustomerNotFoundException("Customer does not exist"));
+        repository.delete(customer);
+    }
 }
