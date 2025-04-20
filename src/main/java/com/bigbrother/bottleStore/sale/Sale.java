@@ -2,7 +2,7 @@ package com.bigbrother.bottleStore.sale;
 
 import com.bigbrother.bottleStore.customer.Customer;
 import com.bigbrother.bottleStore.saleItem.SaleItem;
-import com.bigbrother.bottleStore.sale.payment.SalePayment;
+import com.bigbrother.bottleStore.sale.payment.PaymentMethod;
 import com.bigbrother.bottleStore.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -24,11 +24,11 @@ public class Sale {
     private User seller;
 
     @ManyToOne
-    @JoinColumn(name = "customer_id")
+    @JoinColumn(name = "customer_id", nullable = true)
     private Customer customer;
 
     @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SalePayment> payments = new ArrayList<>();
+    private List<PaymentMethod> paymentMethods = new ArrayList<>();
 
     private LocalDateTime saleDate;
     private Double totalAmount;

@@ -2,10 +2,11 @@ package com.bigbrother.bottleStore.sale;
 
 
 import com.bigbrother.bottleStore.auth.AuthService;
-import com.bigbrother.bottleStore.sale.payment.SalePayment;
+import com.bigbrother.bottleStore.customer.CustomerRepository;
+import com.bigbrother.bottleStore.sale.payment.PaymentMethod;
+import com.bigbrother.bottleStore.sale.payment.PaymentMethodUsedRequest;
 import com.bigbrother.bottleStore.sale.payment.SalePaymentRepository;
 import com.bigbrother.bottleStore.saleItem.SaleItemDTO;
-import com.bigbrother.bottleStore.sale.payment.SalePaymentDTO;
 import com.bigbrother.bottleStore.exceptions.*;
 import com.bigbrother.bottleStore.product.Product;
 import com.bigbrother.bottleStore.product.ProductRepository;
@@ -14,7 +15,7 @@ import com.bigbrother.bottleStore.saleItem.SaleRepository;
 import com.bigbrother.bottleStore.user.User;
 import com.bigbrother.bottleStore.user.UserRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -23,56 +24,31 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class SaleService {
 
-    @Autowired
-    private SaleRepository saleRepository;
-    @Autowired
-    private SaleItemRepository saleItemRepository;
 
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private ProductRepository productRepository;
-    @Autowired
-    private AuthService authService;
-    @Autowired
-    private SalePaymentRepository salePaymentRepository;
+    private final SaleMapper mapper;
+
+    private  final CustomerRepository customerRepository;
+
+    private final SaleRepository saleRepository;
+
+    private final SaleItemRepository saleItemRepository;
+
+    private final UserRepository userRepository;
+
+    private final ProductRepository productRepository;
+
+    private final AuthService authService;
+
+    private final SalePaymentRepository salePaymentRepository;
 
 
-    private SaleDTO convertToSaleDTO(Sale sale) {
-
-        List<SaleItemDTO> saleItemDTO = sale.getProducts().stream().map(item -> new SaleItemDTO(
-                item.getId(),
-                item.getSale().getId(),
-                item.getProduct().getId(),
-                item.getQuantity(),
-                item.getUnitPrice(),
-                item.getTotalPrice(),
-                item.getProfit()
-        )).toList();
-
-        List<SalePaymentDTO> salePaymentDTO = sale.getPayments().stream().map(salePayment -> new SalePaymentDTO(
-                salePayment.getId(),
-                salePayment.getSale().getId(),
-                salePayment.getPaymentMethod(),
-                salePayment.getAmount()
-        )).toList();
-
-        return new SaleDTO(
-                sale.getId(),
-                sale.getSeller().getId(),
-                sale.getSaleDate(),
-                sale.getCustomer().getId(),
-                sale.getTotalAmount(),
-                sale.getTotalProfit(),
-                saleItemDTO,
-                salePaymentDTO
-        );
-    }
     public List<SaleItemDTO> convertToSaleItemDTO(List<SaleItem> saleItems) {
         return saleItems.stream()
                 .map(item -> new SaleItemDTO(
@@ -124,16 +100,21 @@ public class SaleService {
 
 
     @Transactional
-    public SaleDTO createSale(LocalDateTime saleDate, List<SaleItemDTO> items, List<SalePaymentDTO> payments) {
+    public SaleResponse createSale(LocalDateTime saleDate, List<SaleItemDTO> items, List<PaymentMethodUsedRequest> paymentMethods, UUID customerId) {
         Sale sale = new Sale();
         User seller = userRepository.findByUsername(authService.getLoggedInUsername());
+        if(customerId != null) {
+            var customer = customerRepository.findById(customerId).orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+            sale.setCustomer(customer);
+        }
+
         sale.setSeller(seller);
         sale.setSaleDate(saleDate != null ? saleDate : LocalDateTime.now());
 
         Sale savedSale = saveSale(sale, items);
 
-        List<SalePayment> paymentList = payments.stream().map(paymentDTO -> {
-            SalePayment payment = new SalePayment();
+        List<PaymentMethod> paymentList = paymentMethods .stream().map(paymentDTO -> {
+            PaymentMethod payment = new PaymentMethod();
             payment.setSale(savedSale);
             payment.setPaymentMethod(paymentDTO.type());
             payment.setAmount(paymentDTO.amount());
@@ -141,16 +122,16 @@ public class SaleService {
         }).toList();
 
         salePaymentRepository.saveAll(paymentList);
-        savedSale.setPayments(paymentList);
+        savedSale.setPaymentMethods(paymentList);
 
-        return convertToSaleDTO(savedSale);
+        return mapper.fromSale(savedSale);
     }
 
 
 
 
     @Transactional
-    public SaleDTO updateSale(SaleDTO saleDTO, Long id) {
+    public SaleResponse updateSale(SaleRequest request, Long id) {
         Sale sale = saleRepository.findById(id).orElseThrow(() -> new SaleNotFoundException("Sale does not exists"));
 
         for (SaleItem oldItem: sale.getProducts()){
@@ -161,29 +142,29 @@ public class SaleService {
 
         sale.getProducts().clear();
 
-        if(saleDTO.saleDate() != null) {
-            sale.setSaleDate(saleDTO.saleDate());
+        if(request.saleDate() != null) {
+            sale.setSaleDate(request.saleDate());
         }
 
-        return convertToSaleDTO(saveSale(sale, saleDTO.items()));
+        return mapper.fromSale(saveSale(sale, request.items()));
     }
 
 
-    public SaleDTO getSaleById(Long id) {
+    public SaleResponse getSaleById(Long id) {
         Sale sale = saleRepository.findById(id).orElseThrow(() -> new SaleNotFoundException("Sale not found"));
-        return convertToSaleDTO(sale);
+        return mapper.fromSale(sale);
     }
 
-    public List<SaleDTO> getAllSales() {
+    public List<SaleResponse> getAllSales() {
         List<Sale> saleList = saleRepository.findAll();
-        return saleList.stream().map(this::convertToSaleDTO).collect(Collectors.toList());
+        return saleList.stream().map(mapper::fromSale).collect(Collectors.toList());
     }
 
 
-    public List<SaleDTO> getSalesBySellerId(Long sellerId) {
+    public List<SaleResponse> getSalesBySellerId(Long sellerId) {
         User user = userRepository.findById(sellerId).orElseThrow(() -> new UserNotFoundException("User not found"));
         List<Sale> saleList = saleRepository.findBySellerId(user.getId());
-        return saleList.stream().map(this::convertToSaleDTO).collect(Collectors.toList());
+        return saleList.stream().map(mapper::fromSale).collect(Collectors.toList());
     }
 
     public List<SaleItemDTO> getItemsBySaleId(Long saleId) {
@@ -192,22 +173,22 @@ public class SaleService {
         return convertToSaleItemDTO(saleItemList);
     }
 
-    public List<SaleDTO> getSalesByDate(LocalDate saleDate) {
+    public List<SaleResponse> getSalesByDate(LocalDate saleDate) {
         return getSaleDTOS(saleDate, saleDate);
     }
 
-    public List<SaleDTO> getSalesByDateBetween(LocalDate startDate, LocalDate endDate) {
+    public List<SaleResponse> getSalesByDateBetween(LocalDate startDate, LocalDate endDate) {
         return getSaleDTOS(startDate, endDate);
     }
 
-    private List<SaleDTO> getSaleDTOS(LocalDate startDate, LocalDate endDate) {
+    private List<SaleResponse> getSaleDTOS(LocalDate startDate, LocalDate endDate) {
         LocalDateTime startOfDay = startDate.atStartOfDay();
         LocalDateTime endOfDay = endDate.plusDays(1).atStartOfDay();
         List<Sale> sales = saleRepository.findSaleBySaleDateBetween(startOfDay, endOfDay);
         if (sales.isEmpty()) {
             throw new SaleNotFoundException("Sales not found");
         }
-        return sales.stream().map(this::convertToSaleDTO).collect(Collectors.toList());
+        return sales.stream().map(mapper::fromSale).collect(Collectors.toList());
     }
 
 
@@ -233,10 +214,10 @@ public class SaleService {
     }
 
 
-    public List<SaleDTO> getLastNSales(int count) {
+    public List<SaleResponse> getLastNSales(int count) {
         PageRequest pageable = PageRequest.of(0, count, Sort.by("saleDate").descending());
         return saleRepository.findAll(pageable).getContent().stream()
-                .map(this::convertToSaleDTO)
+                .map(mapper::fromSale)
                 .toList();
     }
 }

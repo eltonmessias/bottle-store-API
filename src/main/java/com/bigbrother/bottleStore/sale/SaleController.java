@@ -20,50 +20,50 @@ public class SaleController {
     private SaleRepository saleRepository;
 
     @GetMapping("/latest")
-    public ResponseEntity<List<SaleDTO>>getLastNSales(@RequestParam(defaultValue = "5") int count) {
+    public ResponseEntity<List<SaleResponse>>getLastNSales(@RequestParam(defaultValue = "5") int count) {
         return new ResponseEntity<>(saleService.getLastNSales(count), HttpStatus.OK);
     }
 
 
     @PostMapping("")
-    public ResponseEntity<SaleDTO> createSale(@RequestBody SaleDTO saleDTO) {
+    public ResponseEntity<SaleResponse> createSale(@RequestBody SaleRequest request) {
 
-        return new ResponseEntity<>(saleService.createSale(saleDTO.saleDate(), saleDTO.items(), saleDTO.payments()), HttpStatus.CREATED);
+        return new ResponseEntity<>(saleService.createSale(request.saleDate(), request.items(), request.paymentMethods(), request.customerId()), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SaleDTO> getSale(@PathVariable long id) {
+    public ResponseEntity<SaleResponse> getSale(@PathVariable long id) {
         return new ResponseEntity<>(saleService.getSaleById(id), HttpStatus.OK);
     }
 
     @GetMapping("")
-    public ResponseEntity<List<SaleDTO>> getAllSales() {
+    public ResponseEntity<List<SaleResponse>> getAllSales() {
         return new ResponseEntity<>(saleService.getAllSales(), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SaleDTO> updateSale(@RequestBody SaleDTO saleDTO, @PathVariable long id) {
-        return new ResponseEntity<>(saleService.updateSale(saleDTO, id), HttpStatus.CREATED);
+    public ResponseEntity<SaleResponse> updateSale(@RequestBody SaleRequest request, @PathVariable long id) {
+        return new ResponseEntity<>(saleService.updateSale(request, id), HttpStatus.CREATED);
     }
 
     @GetMapping("/seller/{id}")
-    public ResponseEntity<List<SaleDTO>> getSalesBySellerId(@PathVariable long id) {
+    public ResponseEntity<List<SaleResponse>> getSalesBySellerId(@PathVariable long id) {
         return new ResponseEntity<>(saleService.getSalesBySellerId(id), HttpStatus.OK);
     }
 
     @GetMapping("/date/{saleDate}")
-    public ResponseEntity<List<SaleDTO>> getSalesBySaleDate(@PathVariable String saleDate) {
+    public ResponseEntity<List<SaleResponse>> getSalesBySaleDate(@PathVariable String saleDate) {
         LocalDate date = LocalDate.parse(saleDate);
         return new ResponseEntity<>(saleService.getSalesByDate(date), HttpStatus.OK);
     }
 
 
     @GetMapping("/date/between")
-    public ResponseEntity<List<SaleDTO>> getSalesByDateBetween(@RequestParam String startDate, @RequestParam String endDate){
+    public ResponseEntity<List<SaleResponse>> getSalesByDateBetween(@RequestParam String startDate, @RequestParam String endDate){
         LocalDate start = LocalDate.parse(startDate);
         LocalDate end = LocalDate.parse(endDate);
 
-        List<SaleDTO> sales = saleService.getSalesByDateBetween(start, end);
+        List<SaleResponse> sales = saleService.getSalesByDateBetween(start, end);
         return new ResponseEntity<>(sales, HttpStatus.OK);
     }
 
