@@ -11,7 +11,7 @@ import com.bigbrother.bottleStore.exceptions.*;
 import com.bigbrother.bottleStore.product.Product;
 import com.bigbrother.bottleStore.product.ProductRepository;
 import com.bigbrother.bottleStore.saleItem.SaleItem;
-import com.bigbrother.bottleStore.saleItem.SaleRepository;
+import com.bigbrother.bottleStore.saleItem.SaleItemRepository;
 import com.bigbrother.bottleStore.user.User;
 import com.bigbrother.bottleStore.user.UserRepository;
 import jakarta.transaction.Transactional;
@@ -96,6 +96,14 @@ public class SaleService {
         return saleRepository.save(sale);
     }
 
+    private String generateSaleCode() {
+        String number;
+        do {
+            int random = (int) (Math.random() * 90000) + 10000;
+            number = String.valueOf(random);
+        } while (saleRepository.existsBySaleCode(number));
+        return number;
+    }
 
 
 
@@ -110,6 +118,7 @@ public class SaleService {
 
         sale.setSeller(seller);
         sale.setSaleDate(saleDate != null ? saleDate : LocalDateTime.now());
+        sale.setSaleCode(generateSaleCode());
 
         Sale savedSale = saveSale(sale, items);
 

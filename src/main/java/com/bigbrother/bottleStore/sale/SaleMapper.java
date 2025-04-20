@@ -18,6 +18,7 @@ public class SaleMapper {
                 .map(pm -> new PaymentMethodUsedResponse(pm.getPaymentMethod(), pm.getAmount())).toList();
         return new SaleResponse(
                 sale.getId(),
+                sale.getSaleCode(),
                 sale.getSeller().getId(),
                 sale.getSaleDate(),
                 customerName,

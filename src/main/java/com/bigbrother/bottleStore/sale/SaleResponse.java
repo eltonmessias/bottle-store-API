@@ -9,6 +9,7 @@ import java.util.UUID;
 
 public record SaleResponse(
         long id,
+        String saleCode,
         long sellerId,
         @JsonFormat(pattern = "dd/MM/YYY HH:mm")
         LocalDateTime saleDate,

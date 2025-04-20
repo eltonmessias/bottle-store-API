@@ -1,6 +1,5 @@
-package com.bigbrother.bottleStore.saleItem;
+package com.bigbrother.bottleStore.sale;
 
-import com.bigbrother.bottleStore.sale.Sale;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
@@ -10,4 +9,6 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
     List<Sale> findBySellerId(Long sellerId);
 
     List<Sale> findSaleBySaleDateBetween(LocalDateTime start, LocalDateTime end);
+
+    boolean existsBySaleCode(String saleCode);
 }
