@@ -1,6 +1,6 @@
 package com.bigbrother.bottleStore.product;
 
-import com.bigbrother.bottleStore.Category.Category;
+import com.bigbrother.bottleStore.product.Category.Category;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

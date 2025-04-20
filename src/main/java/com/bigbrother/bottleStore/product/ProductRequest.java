@@ -3,6 +3,8 @@ package com.bigbrother.bottleStore.product;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.UUID;
+
 public record ProductRequest(
         @NotNull(message = "The name of the product is required")
         String name,
@@ -12,7 +14,7 @@ public record ProductRequest(
         @Min(value = 1, message = "The quantity can't be negative")
         int quantity,
         ProductUnitType unitType,
-        Long categoryId
+        UUID categoryId
 ) {
 
 }

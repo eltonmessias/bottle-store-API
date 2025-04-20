@@ -1,7 +1,9 @@
-package com.bigbrother.bottleStore.Category;
+package com.bigbrother.bottleStore.product.Category;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.UUID;
 
 @Getter @Setter
 @Entity
@@ -10,8 +12,8 @@ import lombok.*;
 @AllArgsConstructor
 public class Category {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
     @Column(nullable = false)
     private String name;
     private String description;

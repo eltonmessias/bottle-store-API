@@ -1,13 +1,10 @@
 package com.bigbrother.bottleStore.product;
 
 import com.bigbrother.bottleStore.exceptions.BottleStoreException;
-import com.bigbrother.bottleStore.exceptions.CategoryNotFoundException;
 import com.bigbrother.bottleStore.exceptions.ProductNotFoundException;
-import com.bigbrother.bottleStore.Category.Category;
-import com.bigbrother.bottleStore.Category.CategoryRepository;
+import com.bigbrother.bottleStore.product.Category.CategoryRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

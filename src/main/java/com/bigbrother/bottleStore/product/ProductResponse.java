@@ -3,6 +3,8 @@ package com.bigbrother.bottleStore.product;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.UUID;
+
 public record ProductResponse(
         Long id,
         String productCode,
@@ -12,6 +14,6 @@ public record ProductResponse(
         int quantity,
         ProductUnitType unitType,
         String categoryName,
-        Long categoryId
+        UUID categoryId
 ) {
 }

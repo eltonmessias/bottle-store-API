@@ -1,17 +1,16 @@
 package com.bigbrother.bottleStore.product;
 
 
-import com.bigbrother.bottleStore.Category.Category;
+import com.bigbrother.bottleStore.product.Category.Category;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter @Setter
 @Entity
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

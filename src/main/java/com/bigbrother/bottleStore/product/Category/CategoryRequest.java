@@ -1,8 +1,8 @@
-package com.bigbrother.bottleStore.Category;
+package com.bigbrother.bottleStore.product.Category;
 
 import jakarta.validation.constraints.NotNull;
 
-public record CategoryDTO(
+public record CategoryRequest(
         Long id,
         @NotNull(message = "The name is missing")
         String name,
