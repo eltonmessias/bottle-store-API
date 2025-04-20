@@ -1,6 +1,7 @@
 package com.bigbrother.bottleStore.Category;
 
 import com.bigbrother.bottleStore.exceptions.CategoryNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -8,9 +9,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class CategoryService {
-    @Autowired
-    private CategoryRepository categoryRepository;
+
+    private final CategoryRepository categoryRepository;
 
     private CategoryDTO convertToCategoryDTO(Category category) {
         return new CategoryDTO(

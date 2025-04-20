@@ -5,6 +5,8 @@ import com.bigbrother.bottleStore.exceptions.CategoryNotFoundException;
 import com.bigbrother.bottleStore.exceptions.ProductNotFoundException;
 import com.bigbrother.bottleStore.Category.Category;
 import com.bigbrother.bottleStore.Category.CategoryRepository;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,71 +14,54 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ProductService {
-    @Autowired
-    private ProductRepository productRepository;
-    @Autowired
-    private CategoryRepository categoryRepository;
+    private final ProductMapper mapper;
 
-    private ProductDTO convertToProductDTO(Product product) {
+    private final ProductRepository productRepository;
 
-        return new ProductDTO(
-                product.getId(),
-                product.getName(),
-                product.getSellingPrice(),
-                product.getPurchasePrice(),
-                product.getStockQuantity(),
-                product.getUnitType(),
-                product.getCategory().getName(),
-                product.getCategory().getId()
-        );
-    }
+    private final CategoryRepository categoryRepository;
 
-    public List<ProductDTO> getAllProducts() {
+
+    public List<ProductResponse> getAllProducts() {
         List<Product> products = productRepository.findAll();
         if (products.isEmpty()) {
             throw new ProductNotFoundException("Nenhum produto encontrado!");
         }
-        return products.stream().map(this::convertToProductDTO).collect(Collectors.toList());
+        return products.stream().map(mapper::toProductResponse).collect(Collectors.toList());
     }
 
-    public ProductDTO createProduct(ProductDTO productDTO) {
+
+    public ProductResponse createProduct(@Valid ProductRequest request) {
         try {
-            Category category = categoryRepository.findById(productDTO.categoryId()).orElseThrow(() -> new CategoryNotFoundException("Category not found"));
-            Product product = new Product();
-            product.setName(productDTO.name());
-            product.setSellingPrice(productDTO.sellingPrice());
-            product.setPurchasePrice(productDTO.purchasePrice());
-            product.setStockQuantity(productDTO.quantity());
-            product.setUnitType(productDTO.unitType());
-            product.setCategory(category);
+            var product = mapper.toProduct(request);
             productRepository.save(product);
-            return convertToProductDTO(product);
+            return mapper.toProductResponse(product);
         } catch (Exception e) {
             throw new BottleStoreException("Failed to create product");
         }
     }
 
-    public ProductDTO getProductById(long id) {
+    public ProductResponse getProductById(long id) {
         Product product = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product not found"));
-        return convertToProductDTO(product);
+        return mapper.toProductResponse(product);
 
     }
 
-    public ProductDTO updateProduct(ProductDTO productDTO, Long productId) {
+    public ProductResponse updateProduct(ProductRequest request, Long productId) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new ProductNotFoundException("Product not found"));
-        product.setName(productDTO.name());
-        product.setSellingPrice(productDTO.sellingPrice());
-        product.setPurchasePrice(productDTO.purchasePrice());
-        product.setStockQuantity(productDTO.quantity());
+        product.setName(request.name());
+        product.setSellingPrice(request.sellingPrice());
+        product.setPurchasePrice(request.purchasePrice());
+        product.setStockQuantity(request.quantity());
         productRepository.save(product);
-        return convertToProductDTO(product);
+        return mapper.toProductResponse(product);
     }
 
-    public ProductDTO updateProductQuantity(Long productId, int quantity) {
+    public ProductResponse updateProductQuantity(Long productId, int quantity) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new ProductNotFoundException("Product not found"));
         product.setStockQuantity(product.getStockQuantity() + quantity);
-        return convertToProductDTO(product);
+        return mapper.toProductResponse(product);
     }
 
     public void deleteProduct(Long productId) {

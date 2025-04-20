@@ -1,5 +1,6 @@
 package com.bigbrother.bottleStore.product;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,33 +10,34 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/bigbrother/api/products")
+@RequiredArgsConstructor
 public class ProductController {
 
-    @Autowired
-    private ProductService productService;
 
-    @GetMapping("")
-    public ResponseEntity<List<ProductDTO>> getAllProducts() {
+     private final ProductService productService;
+
+    @GetMapping
+    public ResponseEntity<List<ProductResponse>> getAllProducts() {
         return new ResponseEntity<>(productService.getAllProducts(), HttpStatus.OK);
     }
 
     @PostMapping("")
-    public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO productDTO) {
-        return new ResponseEntity<>(productService.createProduct(productDTO), HttpStatus.CREATED);
+    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest request) {
+        return new ResponseEntity<>(productService.createProduct(request), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDTO> getProductById(@PathVariable long id) {
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable long id) {
         return new ResponseEntity<>(productService.getProductById(id), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductDTO> updateProduct(@PathVariable long id, @RequestBody ProductDTO productDTO) {
-        return new ResponseEntity<>(productService.updateProduct(productDTO, id), HttpStatus.OK);
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable long id, @RequestBody ProductRequest request) {
+        return new ResponseEntity<>(productService.updateProduct(request, id), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ProductDTO> deleteProduct(@PathVariable long id) {
+    public ResponseEntity<ProductResponse> deleteProduct(@PathVariable long id) {
         productService.deleteProduct(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
