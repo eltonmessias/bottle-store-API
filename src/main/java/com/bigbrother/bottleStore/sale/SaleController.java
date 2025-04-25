@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/bigbrother/api/sales")
+@RequestMapping("/api/v1/bigbrother/sales")
 public class SaleController {
 
 

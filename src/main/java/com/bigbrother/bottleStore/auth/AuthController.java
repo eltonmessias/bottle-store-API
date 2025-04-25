@@ -2,12 +2,8 @@ package com.bigbrother.bottleStore.auth;
 
 import com.bigbrother.bottleStore.jwt.JwtResponse;
 import com.bigbrother.bottleStore.jwt.TokenRefreshRequestDTO;
-import com.bigbrother.bottleStore.user.UserDTO;
-import com.bigbrother.bottleStore.user.ROLE;
-import com.bigbrother.bottleStore.user.User;
-import com.bigbrother.bottleStore.user.UserRepository;
+import com.bigbrother.bottleStore.user.*;
 import com.bigbrother.bottleStore.jwt.JwtService;
-import com.bigbrother.bottleStore.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +16,7 @@ import java.util.Map;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/bigbrother/api/auth")
+@RequestMapping("/api/v1/bigbrother/auth")
 public class AuthController {
 
 
@@ -38,22 +34,22 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> register(@RequestBody UserDTO userDTO) {
-        return new ResponseEntity<>(userService.saveUser(userDTO), HttpStatus.CREATED);
+    public ResponseEntity<UserResponse> register(@RequestBody UserRequest request) {
+        return new ResponseEntity<>(userService.saveUser(request), HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserDTO credentials) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
             Authentication authentication = authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(credentials.username(), credentials.password()));
+                    .authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
 
             if(authentication.isAuthenticated()){
-                User user = userRepository.findByUsername(credentials.username());
+                User user = userRepository.findByUsername(request.username());
                 ROLE role = user.getRole();
 
-                String accessToken = jwtService.generateToken(credentials.username(), role);
-                String refreshToken = jwtService.generateRefreshToken(credentials.username());
+                String accessToken = jwtService.generateToken(request.username(), role);
+                String refreshToken = jwtService.generateRefreshToken(request.username());
                 return ResponseEntity.ok(new LoginResponse(accessToken, refreshToken, "Login Successfuly"));
             }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(null, "Invalid username or password"));
