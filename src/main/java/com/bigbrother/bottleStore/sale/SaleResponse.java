@@ -10,7 +10,7 @@ import java.util.UUID;
 public record SaleResponse(
         long id,
         String saleCode,
-        long sellerId,
+        UUID sellerId,
         @JsonFormat(pattern = "dd/MM/YYY HH:mm")
         LocalDateTime saleDate,
         String customerName,

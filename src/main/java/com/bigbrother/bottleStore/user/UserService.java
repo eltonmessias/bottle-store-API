@@ -1,42 +1,37 @@
 package com.bigbrother.bottleStore.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    private UserDTO convertToUserDTO(User user) {
-        return new UserDTO(
-                user.getId(),
-                user.getUsername(),
-                user.getPassword(),
-                user.getEmail(),
-                user.getFullName(),
-                user.getPhone(),
-                user.getRole()
-        );
-    }
+    private final UserMapper mapper;
 
-    public UserDTO saveUser(UserDTO userDTO) {
-        if(userRepository.existsByUsername(userDTO.username())){
+
+    public UserResponse saveUser(UserRequest request) {
+        if(userRepository.existsByUsername(request.username())){
             throw new IllegalArgumentException("Username is already in use");
         }
-        User user = new User();
-        user.setUsername(userDTO.username());
-        user.setPassword(encoder.encode(userDTO.password()));
-        user.setEmail(userDTO.email());
-        user.setFullName(userDTO.fullName());
-        user.setPhone(userDTO.phone());
-        user.setRole(userDTO.role());
+        var user = mapper.toUser(request);
+        userRepository.save(user);
+        return mapper.toUserResponse(user);
+    }
 
-        user = userRepository.save(user);
-        return convertToUserDTO(user);
+    public List<UserResponse> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        if(users.isEmpty()){
+            return null;
+        }
+        return users.stream().map(mapper::toUserResponse).collect(Collectors.toList());
     }
 }

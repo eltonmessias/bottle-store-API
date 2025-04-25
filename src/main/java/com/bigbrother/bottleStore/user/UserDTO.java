@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record UserDTO (
-        Long id,
+        java.util.UUID id,
         @NotNull(message = "The username is necessary")
         @NotBlank(message = "THe user name cannot be blank")
         String username,

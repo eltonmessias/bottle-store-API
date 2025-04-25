@@ -4,9 +4,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public interface SaleRepository extends JpaRepository<Sale, Long> {
-    List<Sale> findBySellerId(Long sellerId);
+    List<Sale> findBySellerId(UUID sellerId);
 
     List<Sale> findSaleBySaleDateBetween(LocalDateTime start, LocalDateTime end);
 
