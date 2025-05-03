@@ -7,9 +7,11 @@ import com.bigbrother.bottleStore.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
 @Getter @Setter
@@ -17,8 +19,8 @@ import java.util.List;
 @Entity
 public class Sale {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(unique = true, nullable = false)
     private String saleCode;
@@ -34,7 +36,7 @@ public class Sale {
     private List<PaymentMethod> paymentMethods = new ArrayList<>();
 
     private LocalDateTime saleDate;
-    private Double totalAmount;
+    private BigDecimal totalAmount;
     private Double totalProfit;
 
     @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL)
@@ -47,12 +49,4 @@ public class Sale {
         }
     }
 
-
-
-    @PreUpdate
-    public void updateTotals() {
-        totalAmount = products.stream().mapToDouble(SaleItem::getTotalPrice).sum();
-
-        totalProfit = products.stream().mapToDouble(SaleItem::calculateProfit).sum();
-    }
 }

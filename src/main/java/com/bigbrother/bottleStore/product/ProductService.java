@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,29 +40,29 @@ public class ProductService {
         }
     }
 
-    public ProductResponse getProductById(long id) {
+    public ProductResponse getProductById(UUID id) {
         Product product = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product not found"));
         return mapper.toProductResponse(product);
 
     }
 
-    public ProductResponse updateProduct(ProductRequest request, Long productId) {
-        Product product = productRepository.findById(productId).orElseThrow(() -> new ProductNotFoundException("Product not found"));
-        product.setName(request.name());
-        product.setSellingPrice(request.sellingPrice());
-        product.setPurchasePrice(request.purchasePrice());
-        product.setStockQuantity(request.quantity());
-        productRepository.save(product);
-        return mapper.toProductResponse(product);
-    }
+//    public ProductResponse updateProduct(ProductRequest request, UUID productId) {
+//        Product product = productRepository.findById(productId).orElseThrow(() -> new ProductNotFoundException("Product not found"));
+//        product.setName(request.name());
+//        product.setSellingPrice(request.sellingPrice());
+//        product.setPurchasePrice(request.purchasePrice());
+//        product.setStockQuantity(request.quantity());
+//        productRepository.save(product);
+//        return mapper.toProductResponse(product);
+//    }
 
-    public ProductResponse updateProductQuantity(Long productId, int quantity) {
+    public ProductResponse updateProductQuantity(UUID productId, int quantity) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new ProductNotFoundException("Product not found"));
         product.setStockQuantity(product.getStockQuantity() + quantity);
         return mapper.toProductResponse(product);
     }
 
-    public void deleteProduct(Long productId) {
+    public void deleteProduct(UUID productId) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new ProductNotFoundException("Product not found"));
         productRepository.delete(product);
     }

@@ -1,19 +1,21 @@
 package com.bigbrother.bottleStore.product;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-
+import java.math.BigDecimal;
+import java.util.Set;
 import java.util.UUID;
 
 public record ProductResponse(
-        Long id,
+        UUID id,
         String productCode,
         String name,
-        double sellingPrice,
-        double purchasePrice,
-        int quantity,
-        ProductUnitType unitType,
         String categoryName,
-        UUID categoryId
+        BigDecimal packPrice,
+        BigDecimal boxPrice,
+        BigDecimal bottlePrice,
+        float quantity,
+        int bottlesPerBox,
+        int bottlesPerPack,
+        Set<SaleUnit> saleUnits
+
 ) {
 }

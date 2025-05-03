@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/bigbrother/sales")
@@ -24,24 +25,24 @@ public class SaleController {
     }
 
 
-    @PostMapping("")
+    @PostMapping
     public ResponseEntity<SaleResponse> createSale(@RequestBody SaleRequest request) {
 
-        return new ResponseEntity<>(saleService.createSale(request.saleDate(), request.items(), request.paymentMethods(), request.customerId()), HttpStatus.CREATED);
+        return new ResponseEntity<>(saleService.createSale( request.items(), request.paymentMethods(), request.customerId()), HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SaleResponse> getSale(@PathVariable long id) {
+    public ResponseEntity<SaleResponse> getSale(@PathVariable UUID id) {
         return new ResponseEntity<>(saleService.getSaleById(id), HttpStatus.OK);
     }
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<List<SaleResponse>> getAllSales() {
         return new ResponseEntity<>(saleService.getAllSales(), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SaleResponse> updateSale(@RequestBody SaleRequest request, @PathVariable long id) {
+    public ResponseEntity<SaleResponse> updateSale(@RequestBody SaleRequest request, @PathVariable UUID id) {
         return new ResponseEntity<>(saleService.updateSale(request, id), HttpStatus.CREATED);
     }
 
@@ -67,7 +68,7 @@ public class SaleController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteSale(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteSale(@PathVariable UUID id) {
         saleService.deleteSale(id);
         return ResponseEntity.noContent().build();
     }

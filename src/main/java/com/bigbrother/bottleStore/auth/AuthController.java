@@ -4,6 +4,7 @@ import com.bigbrother.bottleStore.jwt.JwtResponse;
 import com.bigbrother.bottleStore.jwt.TokenRefreshRequestDTO;
 import com.bigbrother.bottleStore.user.*;
 import com.bigbrother.bottleStore.jwt.JwtService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,20 +18,21 @@ import java.util.Map;
 @RestController
 @CrossOrigin
 @RequestMapping("/api/v1/bigbrother/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
 
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private JwtService jwtService;
-    @Autowired
-    private AuthenticationManager authenticationManager;
 
-    @Autowired
-    private AuthService authService;
+    private final UserService userService;
+
+    private final UserRepository userRepository;
+
+    private final JwtService jwtService;
+
+    private final AuthenticationManager authenticationManager;
+
+
+    private final AuthService authService;
 
 
     @PostMapping("/register")

@@ -22,7 +22,8 @@ public class UserService {
         if(userRepository.existsByUsername(request.username())){
             throw new IllegalArgumentException("Username is already in use");
         }
-        var user = mapper.toUser(request);
+        String password = encoder.encode(request.password());
+        var user = mapper.toUser(request, password);
         userRepository.save(user);
         return mapper.toUserResponse(user);
     }

@@ -8,14 +8,13 @@ import java.util.List;
 import java.util.UUID;
 
 public record SaleResponse(
-        long id,
+        UUID id,
         String saleCode,
         UUID sellerId,
         @JsonFormat(pattern = "dd/MM/YYY HH:mm")
         LocalDateTime saleDate,
         String customerName,
-        Double totalAmount,
-        Double totalProfit,
+        java.math.BigDecimal amount, Double totalAmount,
         List<PaymentMethodUsedResponse> payments
 ) {
 }

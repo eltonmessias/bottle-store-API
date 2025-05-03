@@ -25,12 +25,14 @@ public class ProductMapper {
                 product.getId(),
                 product.getProductCode(),
                 product.getName(),
-                product.getSellingPrice(),
-                product.getPurchasePrice(),
-                product.getStockQuantity(),
-                product.getUnitType(),
                 product.getCategory().getName(),
-                product.getCategory().getId()
+                product.getPackPrice(),
+                product.getBoxPrice(),
+                product.getBottlePrice(),
+                (float) product.getStockQuantity(),
+                product.getBottlesPerBox(),
+                product.getBottlesPerPack(),
+                product.getSaleUnits()
         );
     }
 
@@ -38,10 +40,13 @@ public class ProductMapper {
         return Product.builder()
                 .productCode(generateProductCode())
                 .name(request.name())
-                .sellingPrice(request.sellingPrice())
-                .purchasePrice(request.purchasePrice())
+                .packPrice(request.packPrice())
+                .boxPrice(request.boxPrice())
+                .bottlePrice(request.bottlePrice())
                 .stockQuantity(request.quantity())
-                .unitType(request.unitType())
+                .bottlesPerPack(request.bottlesPerPack())
+                .bottlesPerBox(request.bottlesPerBox())
+                .saleUnits(request.saleUnits())
                 .category(
                         Category.builder()
                                 .id(request.categoryId())

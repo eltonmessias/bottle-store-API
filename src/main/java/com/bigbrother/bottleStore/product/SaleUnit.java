@@ -1,6 +1,7 @@
 package com.bigbrother.bottleStore.product;
 
-public enum ProductUnitType {
+public enum SaleUnit {
     BOX,
-    PACKAGE
+    PACK,
+    BOTTLE
 }

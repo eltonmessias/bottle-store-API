@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/bigbrother/api/categories")
+@RequestMapping("/api/v1/bigbrother/categories")
 @RequiredArgsConstructor
 public class CategoryController {
 

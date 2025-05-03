@@ -1,8 +1,7 @@
 package com.bigbrother.bottleStore.sale;
 
 import com.bigbrother.bottleStore.sale.payment.PaymentMethodUsedRequest;
-import com.bigbrother.bottleStore.sale.payment.PaymentMethodUsedResponse;
-import com.bigbrother.bottleStore.saleItem.SaleItemDTO;
+import com.bigbrother.bottleStore.saleItem.SaleItemRequest;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Null;
 
@@ -11,15 +10,11 @@ import java.util.List;
 import java.util.UUID;
 
 public record SaleRequest(
-        long id,
-        long sellerId,
-        @JsonFormat(pattern = "dd/MM/YYY HH:mm")
-        LocalDateTime saleDate,
+        UUID id,
+        UUID sellerId,
         @Null
         UUID customerId,
-        Double totalAmount,
-        Double totalProfit,
-        List<SaleItemDTO> items,
+        List<SaleItemRequest> items,
         List<PaymentMethodUsedRequest> paymentMethods
 ) {
 }

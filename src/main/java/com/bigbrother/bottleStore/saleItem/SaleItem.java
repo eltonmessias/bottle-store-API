@@ -1,16 +1,23 @@
 package com.bigbrother.bottleStore.saleItem;
 
 import com.bigbrother.bottleStore.product.Product;
+import com.bigbrother.bottleStore.product.SaleUnit;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 import com.bigbrother.bottleStore.sale.Sale;
+
+import java.math.BigDecimal;
+import java.util.UUID;
 
 @Entity
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class SaleItem {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @ManyToOne
     private Sale sale;
@@ -18,24 +25,12 @@ public class SaleItem {
     @ManyToOne
     private Product product;
 
+    @Enumerated(EnumType.STRING)
+    private SaleUnit saleUnit;
     private Integer quantity;
-    private Double unitPrice;
-    private Double totalPrice;
-    private Double profit;
+    private BigDecimal unitPrice;
+    private BigDecimal subtotal;
 
 
-    @PrePersist
-    @PreUpdate
-    public void calculateTotalPrice() {
-        this.profit = calculateProfit();  // Calcula o lucro antes de usá-lo
-        this.totalPrice = this.unitPrice * this.quantity;
-    }
-
-
-
-    public double calculateProfit() {
-        double costPrice = product.getPurchasePrice();
-        return quantity * (unitPrice - costPrice);
-    }
 
 }

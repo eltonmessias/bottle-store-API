@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-public interface SaleRepository extends JpaRepository<Sale, Long> {
+public interface SaleRepository extends JpaRepository<Sale, UUID> {
     List<Sale> findBySellerId(UUID sellerId);
 
     List<Sale> findSaleBySaleDateBetween(LocalDateTime start, LocalDateTime end);

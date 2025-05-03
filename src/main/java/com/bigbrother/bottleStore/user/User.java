@@ -3,8 +3,10 @@ package com.bigbrother.bottleStore.user;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
@@ -12,6 +14,8 @@ import java.util.UUID;
 @Data
 @Table(name = "users")
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
     @Id

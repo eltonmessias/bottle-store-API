@@ -6,12 +6,10 @@ import com.bigbrother.bottleStore.customer.CustomerRepository;
 import com.bigbrother.bottleStore.sale.payment.PaymentMethod;
 import com.bigbrother.bottleStore.sale.payment.PaymentMethodUsedRequest;
 import com.bigbrother.bottleStore.sale.payment.SalePaymentRepository;
-import com.bigbrother.bottleStore.saleItem.SaleItemDTO;
 import com.bigbrother.bottleStore.exceptions.*;
 import com.bigbrother.bottleStore.product.Product;
 import com.bigbrother.bottleStore.product.ProductRepository;
-import com.bigbrother.bottleStore.saleItem.SaleItem;
-import com.bigbrother.bottleStore.saleItem.SaleItemRepository;
+import com.bigbrother.bottleStore.saleItem.*;
 import com.bigbrother.bottleStore.user.User;
 import com.bigbrother.bottleStore.user.UserRepository;
 import jakarta.transaction.Transactional;
@@ -21,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,6 +32,8 @@ public class SaleService {
 
 
     private final SaleMapper mapper;
+
+    private final SaleItemMapper itemMapper;
 
     private  final CustomerRepository customerRepository;
 
@@ -49,52 +50,75 @@ public class SaleService {
     private final SalePaymentRepository salePaymentRepository;
 
 
-    public List<SaleItemDTO> convertToSaleItemDTO(List<SaleItem> saleItems) {
-        return saleItems.stream()
-                .map(item -> new SaleItemDTO(
-                        item.getId(),
-                        item.getSale().getId(),
-                        item.getProduct().getId(),
-                        item.getQuantity(),
-                        item.getUnitPrice(),
-                        item.getTotalPrice(),
-                        item.getProfit()
-                ))
-                .collect(Collectors.toList());
-    }
+    @Transactional
+    protected Sale saveSale(Sale sale, List<SaleItemRequest> items) {
+
+        BigDecimal totalAmount = BigDecimal.ZERO;
+
+        for(SaleItemRequest item : items) {
+            Product product = productRepository
+                    .findById(item.productId()).orElseThrow(() -> new ProductNotFoundException("The product with id " + item.productId() + " does not exist"));
 
 
-    private Sale saveSale(Sale sale, List<SaleItemDTO> items) {
-        for (SaleItemDTO itemDTO : items) {
-            Product product = productRepository.findById(itemDTO.productId())
-                    .orElseThrow(() -> new ProductNotFoundException("Product not found"));
-
-            // Verifica se há estoque suficiente
-            if (product.getStockQuantity() < itemDTO.quantity()) {
-                throw new InsufficientStockException("Not enough stock for product ID: " + itemDTO.productId());
+            double boxesToSubtract = switch (item.saleUnit()) {
+                case BOX -> item.quantity();
+                case PACK -> (double) (item.quantity() * product.getBottlesPerPack()) / product.getBottlesPerBox();
+                case BOTTLE -> (double) item.quantity() / product.getBottlesPerBox();
+            };
+            if(product.getStockQuantity() < boxesToSubtract) {
+                throw new IllegalArgumentException("Insufficient stock quantity");
             }
+            BigDecimal subtotal = switch (item.saleUnit()) {
+                case BOX -> product.getBoxPrice().multiply(BigDecimal.valueOf(item.quantity()));
+                case PACK -> product.getPackPrice().multiply(BigDecimal.valueOf(item.quantity()));
+                case BOTTLE -> product.getBottlePrice().multiply(BigDecimal.valueOf(item.quantity()));
+            };
 
-            // Atualiza o estoque do produto
-            product.setStockQuantity(product.getStockQuantity() - itemDTO.quantity());
+
+            product.setStockQuantity(product.getStockQuantity() - boxesToSubtract);
             productRepository.save(product);
 
-            // Cria um novo SaleItem
-            SaleItem saleItem = new SaleItem();
-            saleItem.setSale(sale);
-            saleItem.setProduct(product);
-            saleItem.setQuantity(itemDTO.quantity());
-            saleItem.setUnitPrice(product.getSellingPrice());
-            saleItem.calculateTotalPrice();
-            saleItem.calculateProfit();
+            var saleItem = itemMapper.toSaleItem(sale, product, item, subtotal);
 
-            sale.getProducts().add(saleItem);
+            totalAmount = totalAmount.add(saleItem.getSubtotal());
+
         }
-
-        // Atualiza os totais
-        sale.updateTotals();
-
+        sale.setTotalAmount(totalAmount);
         return saleRepository.save(sale);
     }
+
+
+//    private Sale saveSale(Sale sale, List<SaleItemDTO> items) {
+//        for (SaleItemDTO itemDTO : items) {
+//            Product product = productRepository.findById(itemDTO.productId())
+//                    .orElseThrow(() -> new ProductNotFoundException("Product not found"));
+//
+//            // Verifica se há estoque suficiente
+//            if (product.getStockQuantity() < itemDTO.quantity()) {
+//                throw new InsufficientStockException("Not enough stock for product ID: " + itemDTO.productId());
+//            }
+//
+//            // Atualiza o estoque do produto
+//            product.setStockQuantity(product.getStockQuantity() - itemDTO.quantity());
+//            productRepository.save(product);
+//
+//            // Cria um novo SaleItem
+//            SaleItem saleItem = new SaleItem();
+//            saleItem.setSale(sale);
+//            saleItem.setProduct(product);
+//            saleItem.setQuantity(itemDTO.quantity());
+//            saleItem.setUnitPrice(product.getSellingPrice());
+//            saleItem.calculateTotalPrice();
+//            saleItem.calculateProfit();
+//
+//            sale.getProducts().add(saleItem);
+//        }
+//
+//        // Atualiza os totais
+//        sale.updateTotals();
+//
+//        return saleRepository.save(sale);
+//    }
 
     private String generateSaleCode() {
         String number;
@@ -108,7 +132,8 @@ public class SaleService {
 
 
     @Transactional
-    public SaleResponse createSale(LocalDateTime saleDate, List<SaleItemDTO> items, List<PaymentMethodUsedRequest> paymentMethods, UUID customerId) {
+    public SaleResponse createSale(List<SaleItemRequest> items,
+                                   List<PaymentMethodUsedRequest> paymentMethods, UUID customerId) {
         Sale sale = new Sale();
         User seller = userRepository.findByUsername(authService.getLoggedInUsername());
         if(customerId != null) {
@@ -117,7 +142,7 @@ public class SaleService {
         }
 
         sale.setSeller(seller);
-        sale.setSaleDate(saleDate != null ? saleDate : LocalDateTime.now());
+        sale.setSaleDate(LocalDateTime.now());
         sale.setSaleCode(generateSaleCode());
 
         Sale savedSale = saveSale(sale, items);
@@ -140,7 +165,7 @@ public class SaleService {
 
 
     @Transactional
-    public SaleResponse updateSale(SaleRequest request, Long id) {
+    public SaleResponse updateSale(SaleRequest request, UUID id) {
         Sale sale = saleRepository.findById(id).orElseThrow(() -> new SaleNotFoundException("Sale does not exists"));
 
         for (SaleItem oldItem: sale.getProducts()){
@@ -148,18 +173,14 @@ public class SaleService {
             product.setStockQuantity(product.getStockQuantity() + oldItem.getQuantity());
             productRepository.save(product);
         }
-
         sale.getProducts().clear();
 
-        if(request.saleDate() != null) {
-            sale.setSaleDate(request.saleDate());
-        }
 
         return mapper.fromSale(saveSale(sale, request.items()));
     }
 
 
-    public SaleResponse getSaleById(Long id) {
+    public SaleResponse getSaleById(UUID id) {
         Sale sale = saleRepository.findById(id).orElseThrow(() -> new SaleNotFoundException("Sale not found"));
         return mapper.fromSale(sale);
     }
@@ -176,10 +197,10 @@ public class SaleService {
         return saleList.stream().map(mapper::fromSale).collect(Collectors.toList());
     }
 
-    public List<SaleItemDTO> getItemsBySaleId(Long saleId) {
+    public List<SaleItemResponse> getItemsBySaleId(UUID saleId) {
         Sale sale = saleRepository.findById(saleId).orElseThrow(() -> new SaleNotFoundException("Sale not found"));
         List<SaleItem> saleItemList = saleItemRepository.findBySaleId(sale.getId());
-        return convertToSaleItemDTO(saleItemList);
+        return saleItemList.stream().map(itemMapper::toSaleItemResponse).collect(Collectors.toList());
     }
 
     public List<SaleResponse> getSalesByDate(LocalDate saleDate) {
@@ -201,7 +222,7 @@ public class SaleService {
     }
 
 
-    public void deleteSale(Long saleId) {
+    public void deleteSale(UUID saleId) {
         Sale sale = saleRepository.findById(saleId).orElseThrow(() -> new SaleNotFoundException("Sale not found with ID: "+ saleId));
 
         try {

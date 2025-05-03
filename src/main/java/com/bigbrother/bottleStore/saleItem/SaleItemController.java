@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/bigbrother/sale-items")
@@ -22,7 +23,7 @@ public class SaleItemController {
     private SaleService saleService;
 
     @GetMapping("/sale/{id}")
-    public ResponseEntity<List<SaleItemDTO>> getSaleItemsBySaleId(@PathVariable Long id) {
+    public ResponseEntity<List<SaleItemResponse>> getSaleItemsBySaleId(@PathVariable UUID id) {
         return new ResponseEntity<>(saleService.getItemsBySaleId(id), HttpStatus.OK);
     }
 }

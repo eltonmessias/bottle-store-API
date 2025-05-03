@@ -41,7 +41,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests( request ->
                         request
                                 .requestMatchers("/bigbrother/api/auth/admin/**").hasRole("ADMIN")
-                                .requestMatchers("/bigbrother/api/auth/login", "/bigbrother/api/auth/register", "/bigbrother/api/auth/refresh").permitAll()
+                                .requestMatchers("/api/v1/bigbrother/auth/login", "/api/v1/bigbrother/auth/register", "/api/v1/bigbrother/auth/refresh").permitAll()
                                 .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

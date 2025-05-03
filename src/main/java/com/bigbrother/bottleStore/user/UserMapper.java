@@ -11,16 +11,18 @@ public class UserMapper {
                 user.getId(),
                 user.getUsername(),
                 user.getFullName(),
+                user.getPassword(),
                 user.getEmail(),
                 user.getPhone(),
                 user.getRole().name()
         );
     }
 
-    public User toUser(UserRequest request) {
+    public User toUser(UserRequest request, String password) {
         return User.builder()
                 .id(request.id())
                 .username(request.username())
+                .password(password)
                 .fullName(request.fullName())
                 .email(request.email())
                 .phone(request.phone())

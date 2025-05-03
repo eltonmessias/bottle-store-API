@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/bigbrother/products")
@@ -27,17 +28,17 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponse> getProductById(@PathVariable long id) {
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable UUID id) {
         return new ResponseEntity<>(productService.getProductById(id), HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ProductResponse> updateProduct(@PathVariable long id, @RequestBody ProductRequest request) {
-        return new ResponseEntity<>(productService.updateProduct(request, id), HttpStatus.OK);
-    }
+//    @PutMapping("/{id}")
+//    public ResponseEntity<ProductResponse> updateProduct(@PathVariable UUID id, @RequestBody ProductRequest request) {
+//        return new ResponseEntity<>(productService.updateProduct(request, id), HttpStatus.OK);
+//    }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ProductResponse> deleteProduct(@PathVariable long id) {
+    public ResponseEntity<ProductResponse> deleteProduct(@PathVariable UUID id) {
         productService.deleteProduct(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

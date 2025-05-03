@@ -3,8 +3,9 @@ package com.bigbrother.bottleStore.saleItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.UUID;
 
-public interface SaleItemRepository extends JpaRepository<SaleItem, Long> {
-    List<SaleItem> findBySaleId(Long saleId);
+public interface SaleItemRepository extends JpaRepository<SaleItem, UUID> {
+    List<SaleItem> findBySaleId(UUID saleId);
 
 }
