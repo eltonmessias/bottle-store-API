@@ -5,7 +5,6 @@ import com.bigbrother.bottleStore.jwt.TokenRefreshRequestDTO;
 import com.bigbrother.bottleStore.user.*;
 import com.bigbrother.bottleStore.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,7 +40,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@RequestBody AuthRequest request) {
         try {
             Authentication authentication = authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
@@ -52,7 +51,7 @@ public class AuthController {
 
                 String accessToken = jwtService.generateToken(request.username(), role);
                 String refreshToken = jwtService.generateRefreshToken(request.username());
-                return ResponseEntity.ok(new LoginResponse(accessToken, refreshToken, "Login Successfuly"));
+                return ResponseEntity.ok(new com.bigbrother.bottleStore.auth.AuthResponse(accessToken, refreshToken, "Login Successfuly"));
             }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(null, "Invalid username or password"));
         } catch (Exception e) {

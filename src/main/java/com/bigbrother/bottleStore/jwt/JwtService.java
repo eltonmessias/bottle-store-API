@@ -29,24 +29,25 @@ public class JwtService {
     private Long refreshExpiration;
 
 
-    public String generateToken(String username, ROLE role){
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("role", role);
+    public String generateToken(UserDetails userDetails){
+//        Map<String, Object> claims = new HashMap<>();
+//        claims.put("role", role);
 
         return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(username)
+//                .setClaims(claims)
+                .setSubject(userDetails.getUsername())
+                .claim("role", userDetails.getAuthorities().iterator().next().getAuthority())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public String generateRefreshToken(String username){
+    public String generateRefreshToken(UserDetails userDetails){
         Map<String, Object> claims = new HashMap<>();
         return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(username)
+//                .setClaims(claims)
+                .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + refreshExpiration))
                 .signWith(getKey(), SignatureAlgorithm.HS256)
@@ -76,10 +77,10 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public ROLE extractRole(String token){
-        Claims claims = extractAllClaims(token);
-        return ROLE.valueOf(claims.get("role", String.class));
-    }
+//    public ROLE extractRole(String token){
+//        Claims claims = extractAllClaims(token);
+//        return ROLE.valueOf(claims.get("role", String.class));
+//    }
 
     public boolean validateToken(String token, UserDetails userDetails){
         final String username = extractUsername(token);

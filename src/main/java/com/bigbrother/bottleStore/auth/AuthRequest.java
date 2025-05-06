@@ -1,6 +1,6 @@
 package com.bigbrother.bottleStore.auth;
 
-public record LoginRequest(
+public record AuthRequest(
         String username,
         String password
 ) {
