@@ -1,25 +1,23 @@
 package com.bigbrother.bottleStore.auth;
 
-import com.bigbrother.bottleStore.jwt.JwtResponse;
-import com.bigbrother.bottleStore.jwt.TokenRefreshRequestDTO;
+
 import com.bigbrother.bottleStore.user.*;
 import com.bigbrother.bottleStore.jwt.JwtService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin
 @RequestMapping("/api/v1/bigbrother/auth")
 @RequiredArgsConstructor
 public class AuthController {
-
 
 
     private final UserService userService;
@@ -41,27 +39,12 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
-        try {
-            Authentication authentication = authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(request.username(), request.password()));
-
-            if(authentication.isAuthenticated()){
-                User user = userRepository.findByUsername(request.username());
-                ROLE role = user.getRole();
-
-                String accessToken = jwtService.generateToken(request.username(), role);
-                String refreshToken = jwtService.generateRefreshToken(request.username());
-                return ResponseEntity.ok(new com.bigbrother.bottleStore.auth.AuthResponse(accessToken, refreshToken, "Login Successfuly"));
-            }
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(null, "Invalid username or password"));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse(e.getMessage(), "Invalid username or password"));
-        }
+        return new ResponseEntity<>(authService.authenticate(request), HttpStatus.OK);
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<JwtResponse> refreshToken(@RequestBody TokenRefreshRequestDTO request) {
-        return ResponseEntity.ok(authService.refreshAccessToken(request.refreshToken()));
+    public ResponseEntity<AuthResponse> refreshToken(HttpServletRequest request) {
+        return authService.refreshToken(request);
     }
 
     @GetMapping("/username")
@@ -72,7 +55,6 @@ public class AuthController {
 
 
 
-    record AuthResponse(String token, String message) {}
 
 
 }

@@ -1,5 +1,6 @@
 package com.bigbrother.bottleStore.product;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ public class ProductController {
      private final ProductService productService;
 
     @GetMapping
+    @Operation(summary = "List of all products")
     public ResponseEntity<List<ProductResponse>> getAllProducts() {
         return new ResponseEntity<>(productService.getAllProducts(), HttpStatus.OK);
     }
