@@ -45,6 +45,15 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private ROLE role;
 
+    public User(UserRequest request) {
+        this.username = request.username();
+        this.password = request.password();
+        this.fullName = request.fullName();
+        this.email = request.email();
+        this.phone = request.phone();
+        this.role = request.role();
+    }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

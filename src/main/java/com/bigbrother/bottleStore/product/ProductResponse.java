@@ -12,7 +12,7 @@ public record ProductResponse(
         BigDecimal packPrice,
         BigDecimal boxPrice,
         BigDecimal bottlePrice,
-        float quantity,
+        double quantity,
         int bottlesPerBox,
         int bottlesPerPack,
         Set<SaleUnit> saleUnits

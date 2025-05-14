@@ -12,11 +12,15 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Category {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     @Column(nullable = false)
     private String name;
     private String description;
 
 
+    public Category(CategoryRequest request) {
+        this.name = request.name();
+        this.description = request.description();
+    }
 }

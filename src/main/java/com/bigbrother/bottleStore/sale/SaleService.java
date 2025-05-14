@@ -12,6 +12,7 @@ import com.bigbrother.bottleStore.product.ProductRepository;
 import com.bigbrother.bottleStore.saleItem.*;
 import com.bigbrother.bottleStore.user.User;
 import com.bigbrother.bottleStore.user.UserRepository;
+import com.bigbrother.bottleStore.user.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -23,6 +24,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -48,6 +50,7 @@ public class SaleService {
     private final AuthService authService;
 
     private final SalePaymentRepository salePaymentRepository;
+    private final UserService userService;
 
 
     @Transactional
@@ -135,7 +138,7 @@ public class SaleService {
     public SaleResponse createSale(List<SaleItemRequest> items,
                                    List<PaymentMethodUsedRequest> paymentMethods, UUID customerId) {
         Sale sale = new Sale();
-        User seller = userRepository.findByUsername(authService.getLoggedInUsername());
+        User seller = userService.getLoggedUser();
         if(customerId != null) {
             var customer = customerRepository.findById(customerId).orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
             sale.setCustomer(customer);
