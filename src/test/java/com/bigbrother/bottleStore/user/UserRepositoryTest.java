@@ -41,9 +41,8 @@ class UserRepositoryTest {
         this.createUser(data);
         User result = this.userRepository.findByUsername(username);
 
-        assertThat(result).isNotNull(); // Verifica se o Optional contém um valor
-        assertThat(result.getUsername()).isEqualTo(username); // Acessa o User e verifica o username
-        // Você pode adicionar mais asserções para verificar outros campos do User
+        assertThat(result).isNotNull();
+        assertThat(result.getUsername()).isEqualTo(username);
     }
 
 

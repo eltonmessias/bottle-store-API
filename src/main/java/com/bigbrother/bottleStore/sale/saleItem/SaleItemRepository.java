@@ -1,4 +1,4 @@
-package com.bigbrother.bottleStore.saleItem;
+package com.bigbrother.bottleStore.sale.saleItem;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

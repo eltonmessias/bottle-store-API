@@ -9,7 +9,7 @@ import com.bigbrother.bottleStore.sale.payment.SalePaymentRepository;
 import com.bigbrother.bottleStore.exceptions.*;
 import com.bigbrother.bottleStore.product.Product;
 import com.bigbrother.bottleStore.product.ProductRepository;
-import com.bigbrother.bottleStore.saleItem.*;
+import com.bigbrother.bottleStore.sale.saleItem.*;
 import com.bigbrother.bottleStore.user.User;
 import com.bigbrother.bottleStore.user.UserRepository;
 import com.bigbrother.bottleStore.user.UserService;
@@ -24,7 +24,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -90,38 +89,6 @@ public class SaleService {
         return saleRepository.save(sale);
     }
 
-
-//    private Sale saveSale(Sale sale, List<SaleItemDTO> items) {
-//        for (SaleItemDTO itemDTO : items) {
-//            Product product = productRepository.findById(itemDTO.productId())
-//                    .orElseThrow(() -> new ProductNotFoundException("Product not found"));
-//
-//            // Verifica se há estoque suficiente
-//            if (product.getStockQuantity() < itemDTO.quantity()) {
-//                throw new InsufficientStockException("Not enough stock for product ID: " + itemDTO.productId());
-//            }
-//
-//            // Atualiza o estoque do produto
-//            product.setStockQuantity(product.getStockQuantity() - itemDTO.quantity());
-//            productRepository.save(product);
-//
-//            // Cria um novo SaleItem
-//            SaleItem saleItem = new SaleItem();
-//            saleItem.setSale(sale);
-//            saleItem.setProduct(product);
-//            saleItem.setQuantity(itemDTO.quantity());
-//            saleItem.setUnitPrice(product.getSellingPrice());
-//            saleItem.calculateTotalPrice();
-//            saleItem.calculateProfit();
-//
-//            sale.getProducts().add(saleItem);
-//        }
-//
-//        // Atualiza os totais
-//        sale.updateTotals();
-//
-//        return saleRepository.save(sale);
-//    }
 
     private String generateSaleCode() {
         String number;

@@ -1,4 +1,4 @@
-package com.bigbrother.bottleStore.saleItem;
+package com.bigbrother.bottleStore.sale.saleItem;
 
 import com.bigbrother.bottleStore.product.SaleUnit;
 

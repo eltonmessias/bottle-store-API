@@ -1,4 +1,4 @@
-package com.bigbrother.bottleStore.saleItem;
+package com.bigbrother.bottleStore.sale.saleItem;
 
 import java.math.BigDecimal;
 import java.util.UUID;

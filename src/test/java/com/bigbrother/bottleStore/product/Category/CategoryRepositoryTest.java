@@ -23,7 +23,7 @@ class CategoryRepositoryTest {
     private EntityManager entityManager;
 
     @Test
-    @DisplayName("Should get the category successfully")
+    @DisplayName("Test 1:Should get the category successfully")
     public void findByName() {
         String name = "Wine";
         CategoryRequest categoryRequest = new CategoryRequest(
@@ -40,9 +40,12 @@ class CategoryRepositoryTest {
         assertEquals("Wine", result.get().getName());
     }
 
+
     private void createCategory(CategoryRequest request) {
         Category category = new Category(request);
         this.entityManager.persist(category);
     }
+
+
 }
 

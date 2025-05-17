@@ -1,7 +1,7 @@
 package com.bigbrother.bottleStore.sale;
 
 import com.bigbrother.bottleStore.customer.Customer;
-import com.bigbrother.bottleStore.saleItem.SaleItem;
+import com.bigbrother.bottleStore.sale.saleItem.SaleItem;
 import com.bigbrother.bottleStore.sale.payment.PaymentMethod;
 import com.bigbrother.bottleStore.user.User;
 import jakarta.persistence.*;
