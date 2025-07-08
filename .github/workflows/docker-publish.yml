@@ -5,36 +5,30 @@ on:
     branches: ["main"]
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout do repositório
+      - name: Checkout do código
         uses: actions/checkout@v3
 
-      - name: Configurar JDK 21
+      - name: Setup Java 21
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Build sem testes (caso não queira rodar testes)
+      - name: Build JAR com Maven
         run: mvn clean package -DskipTests
-
-      # Caso deseje rodar os testes, basta substituir a linha anterior por esta:
-      # - name: Rodar testes com Maven
-      #   run: mvn test
 
       - name: Login no Docker Hub
         uses: docker/login-action@v2
         with:
-          username: ${{secrets.DOCKERHUB_USERNAME}}
-          password: ${{secrets.DOCKERHUB_PASSWORD}}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Build da imagem Docker
-        run: docker build -t eltonmessias/bottle-store:latest eltonmessias/bottle-store:${{ github.sha }} .
+      - name: Build da imagem Docker (sem cache)
+        run: docker build --no-cache -t eltonmessias/bottle-store:latest .
 
-      - name: Push para o Docker Hub
-        run: | 
-          docker push eltonmessias/bottle-store:latest
-          docker push eltonmessias/bottle-store:${{ github.sha }}
+      - name: Push da imagem para o Docker Hub
+        run: docker push eltonmessias/bottle-store:latest
