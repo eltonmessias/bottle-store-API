@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    - runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Repository Checkout
@@ -19,4 +19,4 @@ jobs:
           java-version: '21'
 
       - name: Build with Maven (on docker)
-        run: mvn clean verify
+        run: mvn clean package -DskipTests

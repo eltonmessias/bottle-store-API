@@ -1,11 +1,9 @@
 package com.bigbrother.bottleStore.sale;
 
 import com.bigbrother.bottleStore.sale.payment.PaymentMethodUsedRequest;
-import com.bigbrother.bottleStore.saleItem.SaleItemRequest;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.bigbrother.bottleStore.sale.saleItem.SaleItemRequest;
 import jakarta.validation.constraints.Null;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
