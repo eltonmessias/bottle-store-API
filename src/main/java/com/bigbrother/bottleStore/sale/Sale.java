@@ -37,8 +37,6 @@ public class Sale {
 
     private LocalDateTime saleDate;
     private BigDecimal totalAmount;
-    private Double totalProfit;
-
     @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL)
     private List<SaleItem> products = new ArrayList<>();
 

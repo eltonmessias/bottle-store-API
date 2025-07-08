@@ -11,7 +11,7 @@ public record ProductResponse(
         String categoryName,
         BigDecimal packPrice,
         BigDecimal boxPrice,
-        BigDecimal bottlePrice,
+        BigDecimal unitPrice,
         double quantity,
         int bottlesPerBox,
         int bottlesPerPack,

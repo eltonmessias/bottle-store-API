@@ -64,7 +64,7 @@ class ProductRepositoryTest {
         newProduct.setProductCode("55514"); // ou gere automaticamente se necessário
         newProduct.setPackPrice(request.packPrice());
         newProduct.setBoxPrice(request.boxPrice());
-        newProduct.setBottlePrice(request.bottlePrice());
+        newProduct.setUnitPrice(request.unitPrice());
         newProduct.setStockQuantity(request.quantity());
         newProduct.setBottlesPerBox(request.bottlesPerBox());
         newProduct.setBottlesPerPack(request.bottlesPerPack());

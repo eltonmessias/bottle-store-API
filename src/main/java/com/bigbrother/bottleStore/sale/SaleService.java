@@ -73,7 +73,7 @@ public class SaleService {
             BigDecimal subtotal = switch (item.saleUnit()) {
                 case BOX -> product.getBoxPrice().multiply(BigDecimal.valueOf(item.quantity()));
                 case PACK -> product.getPackPrice().multiply(BigDecimal.valueOf(item.quantity()));
-                case BOTTLE -> product.getBottlePrice().multiply(BigDecimal.valueOf(item.quantity()));
+                case BOTTLE -> product.getUnitPrice().multiply(BigDecimal.valueOf(item.quantity()));
             };
 
 

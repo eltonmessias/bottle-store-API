@@ -14,7 +14,7 @@ public record ProductRequest(
         @Min(value = 1, message = "the price must be higher or equal to 1")
         BigDecimal packPrice,
         BigDecimal boxPrice,
-        BigDecimal bottlePrice,
+        BigDecimal unitPrice,
         @Min(value = 1, message = "The quantity can't be negative")
         int quantity,
         int bottlesPerBox,

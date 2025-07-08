@@ -23,7 +23,6 @@ public class SaleMapper {
                 sale.getSaleDate(),
                 customerName,
                 sale.getTotalAmount(),
-                sale.getTotalProfit(),
                 paymentMethods
         );
     }

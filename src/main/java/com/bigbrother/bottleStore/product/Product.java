@@ -29,7 +29,7 @@ public class Product {
     private Category category;
     private BigDecimal packPrice;
     private BigDecimal boxPrice;
-    private BigDecimal bottlePrice;
+    private BigDecimal unitPrice;
     private double stockQuantity;
     private int bottlesPerBox;
     private int bottlesPerPack;

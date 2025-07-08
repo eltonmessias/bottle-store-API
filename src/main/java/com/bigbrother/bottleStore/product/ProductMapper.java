@@ -28,7 +28,7 @@ public class ProductMapper {
                 product.getCategory().getName(),
                 product.getPackPrice(),
                 product.getBoxPrice(),
-                product.getBottlePrice(),
+                product.getUnitPrice(),
                 (float) product.getStockQuantity(),
                 product.getBottlesPerBox(),
                 product.getBottlesPerPack(),
@@ -42,7 +42,7 @@ public class ProductMapper {
                 .name(request.name())
                 .packPrice(request.packPrice())
                 .boxPrice(request.boxPrice())
-                .bottlePrice(request.bottlePrice())
+                .unitPrice(request.unitPrice())
                 .stockQuantity(request.quantity())
                 .bottlesPerPack(request.bottlesPerPack())
                 .bottlesPerBox(request.bottlesPerBox())
