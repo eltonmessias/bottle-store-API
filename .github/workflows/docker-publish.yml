@@ -32,7 +32,9 @@ jobs:
           password: ${{secrets.DOCKERHUB_PASSWORD}}
 
       - name: Build da imagem Docker
-        run: docker build -t eltonmessias/bottle-store:latest .
+        run: docker build -t eltonmessias/bottle-store:latest eltonmessias/bottle-store:${{ github.sha }} .
 
       - name: Push para o Docker Hub
-        run: docker push eltonmessias/bottle-store:latest
+        run: | 
+          docker push eltonmessias/bottle-store:latest
+          docker push eltonmessias/bottle-store:${{ github.sha }}
